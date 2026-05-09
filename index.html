@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ArancelPro — Calculadora de Importación Argentina</title>
+<meta name="description" content="Calculá el costo real de importar productos desde China a Argentina. CIF, aranceles, IVA, margen de ganancia para responsables inscriptos." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:        #0c0e14;
+    --bg-card:   #13151f;
+    --bg-input:  #1a1d29;
+    --bg-hover:  #1f2230;
+    --border:    rgba(255,255,255,0.07);
+    --border-md: rgba(255,255,255,0.12);
+    --accent:    #00c896;
+    --accent-dim:#00a07a;
+    --accent-bg: rgba(0,200,150,0.08);
+    --blue:      #4a9eff;
+    --blue-bg:   rgba(74,158,255,0.08);
+    --amber:     #f5a623;
+    --amber-bg:  rgba(245,166,35,0.08);
+    --danger:    #ff5c5c;
+    --danger-bg: rgba(255,92,92,0.08);
+    --text-1:    #f0f2f8;
+    --text-2:    #8b90a8;
+    --text-3:    #565c75;
+    --font:      'DM Sans', system-ui, sans-serif;
+    --mono:      'DM Mono', 'Courier New', monospace;
+    --radius:    10px;
+    --radius-lg: 14px;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text-1);
+    font-family: var(--font);
+    font-size: 15px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  header {
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    position: sticky;
+    top: 0;
+    background: rgba(12,14,20,0.92);
+    backdrop-filter: blur(12px);
+    z-index: 100;
+  }
+  .header-inner {
+    max-width: 960px;
+    margin: 0 auto;
+    height: 58px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .logo-icon {
+    width: 30px;
+    height: 30px;
+    background: var(--accent);
+    border-radius: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .logo-icon svg { width: 16px; height: 16px; fill: #0c0e14; }
+  .logo-name {
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: -0.3px;
+    color: var(--text-1);
+  }
+  .logo-name span { color: var(--accent); }
+  .header-badge {
+    font-size: 11px;
+    font-family: var(--mono);
+    color: var(--text-3);
+    border: 1px solid var(--border);
+    padding: 3px 8px;
+    border-radius: 20px;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 3.5rem 2rem 2rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .hero-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: var(--accent-bg);
+    border: 1px solid rgba(0,200,150,0.2);
+    padding: 4px 10px;
+    border-radius: 20px;
+    margin-bottom: 1.25rem;
+  }
+  .hero-tag::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+  }
+  .hero h1 {
+    font-size: clamp(26px, 4vw, 36px);
+    font-weight: 600;
+    letter-spacing: -0.5px;
+    line-height: 1.2;
+    color: var(--text-1);
+    margin-bottom: 0.75rem;
+  }
+  .hero h1 em {
+    font-style: normal;
+    color: var(--accent);
+  }
+  .hero p {
+    color: var(--text-2);
+    font-size: 15px;
+    max-width: 540px;
+    line-height: 1.7;
+  }
+
+  /* ── LAYOUT ── */
+  main {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 2.5rem 2rem 5rem;
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 1.5rem;
+    align-items: start;
+  }
+
+  @media (max-width: 760px) {
+    main { grid-template-columns: 1fr; padding: 1.5rem 1rem 4rem; }
+    .hero { padding: 2rem 1rem 1.5rem; }
+    header { padding: 0 1rem; }
+  }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+  }
+  .card:last-child { margin-bottom: 0; }
+
+  .card-title {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--text-3);
+    margin-bottom: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* ── FORM ── */
+  .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+  .field-grid.one { grid-template-columns: 1fr; }
+  .field-grid.three { grid-template-columns: 1fr 1fr 1fr; }
+
+  .field { display: flex; flex-direction: column; gap: 5px; }
+  .field label {
+    font-size: 12px;
+    color: var(--text-2);
+    font-weight: 400;
+  }
+  .field input {
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text-1);
+    font-family: var(--mono);
+    font-size: 14px;
+    padding: 9px 12px;
+    outline: none;
+    transition: border-color 0.15s;
+    width: 100%;
+  }
+  .field input:focus { border-color: var(--accent); }
+  .field input::placeholder { color: var(--text-3); }
+  .field input::-webkit-inner-spin-button,
+  .field input::-webkit-outer-spin-button { opacity: 0.4; }
+  .field .hint { font-size: 11px; color: var(--text-3); }
+
+  .derived-row {
+    background: var(--bg-input);
+    border-radius: var(--radius);
+    padding: 8px 12px;
+    font-size: 13px;
+    color: var(--text-2);
+    margin-top: 4px;
+    margin-bottom: 10px;
+  }
+  .derived-row span {
+    font-family: var(--mono);
+    color: var(--accent);
+    font-size: 13px;
+  }
+
+  /* ── STICKY RESULTS PANEL ── */
+  .results-col { position: sticky; top: 74px; }
+
+  /* ── UNIT COST BIG DISPLAY ── */
+  .unit-hero {
+    background: linear-gradient(135deg, rgba(0,200,150,0.1), rgba(0,200,150,0.03));
+    border: 1px solid rgba(0,200,150,0.2);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    text-align: center;
+    margin-bottom: 10px;
+  }
+  .unit-hero .uh-label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.5rem;
+  }
+  .unit-hero .uh-usd {
+    font-family: var(--mono);
+    font-size: 36px;
+    font-weight: 500;
+    color: var(--accent);
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .unit-hero .uh-ars {
+    font-family: var(--mono);
+    font-size: 20px;
+    color: var(--text-2);
+  }
+
+  /* ── METRIC GRID ── */
+  .metric-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .metric-box {
+    background: var(--bg-input);
+    border-radius: var(--radius);
+    padding: 10px 12px;
+  }
+  .metric-box .mb-label { font-size: 11px; color: var(--text-3); margin-bottom: 3px; }
+  .metric-box .mb-value { font-family: var(--mono); font-size: 14px; color: var(--text-1); }
+
+  /* ── BREAKDOWN TABLE ── */
+  .breakdown {
+    background: var(--bg-input);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-bottom: 10px;
+  }
+  .brow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 7px 12px;
+    font-size: 12.5px;
+    border-bottom: 1px solid var(--border);
+  }
+  .brow:last-child { border-bottom: none; }
+  .brow .bl { color: var(--text-2); }
+  .brow .bv { font-family: var(--mono); font-size: 12.5px; color: var(--text-1); }
+  .brow.sub { background: rgba(255,255,255,0.02); }
+  .brow.sub .bl { color: var(--text-3); font-size: 11.5px; }
+  .brow.sub .bv { color: var(--text-3); font-size: 11.5px; }
+  .brow.total-row {
+    background: rgba(0,200,150,0.06);
+    border-top: 1px solid rgba(0,200,150,0.15);
+  }
+  .brow.total-row .bl { color: var(--accent); font-weight: 500; font-size: 13px; }
+  .brow.total-row .bv { color: var(--accent); font-weight: 500; font-size: 13px; }
+
+  .badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 1px 5px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 4px;
+    color: var(--text-3);
+    margin-left: 4px;
+  }
+
+  /* ── MARGEN SECTION ── */
+  .margen-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    margin-top: 1rem;
+  }
+
+  .margen-trio {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+    margin: 1rem 0;
+  }
+  .mt-box {
+    border-radius: var(--radius);
+    padding: 12px;
+    text-align: center;
+  }
+  .mt-box .mt-label { font-size: 10px; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 5px; }
+  .mt-box .mt-value { font-family: var(--mono); font-size: 18px; font-weight: 500; }
+  .mt-ganancia { background: var(--accent-bg); border: 1px solid rgba(0,200,150,0.15); }
+  .mt-ganancia .mt-value { color: var(--accent); }
+  .mt-margen, .mt-markup { background: var(--bg-input); border: 1px solid var(--border); }
+  .mt-margen .mt-value, .mt-markup .mt-value { color: var(--text-1); }
+
+  .warning-neg {
+    background: var(--danger-bg);
+    border: 1px solid rgba(255,92,92,0.2);
+    border-radius: var(--radius);
+    padding: 8px 12px;
+    font-size: 12.5px;
+    color: var(--danger);
+    display: none;
+    margin-bottom: 8px;
+  }
+
+  .precios-sug {
+    background: var(--bg-input);
+    border-radius: var(--radius);
+    padding: 12px;
+    margin-top: 8px;
+  }
+  .ps-title { font-size: 11px; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 10px; }
+  .ps-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; text-align: center; }
+  .ps-item .ps-pct { font-size: 10px; color: var(--text-3); margin-bottom: 3px; }
+  .ps-item .ps-val { font-family: var(--mono); font-size: 13px; color: var(--text-1); font-weight: 500; }
+
+  /* ── FOOTER ── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 1.5rem 2rem;
+    text-align: center;
+    font-size: 12px;
+    color: var(--text-3);
+  }
+  footer span { color: var(--text-2); }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border-md); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="logo">
+      <div class="logo-icon">
+        <svg viewBox="0 0 16 16"><path d="M2 4h12v1.5H2zM4 7h8v1.5H4zM6 10h4v1.5H6z"/></svg>
+      </div>
+      <div class="logo-name">Arancel<span>Pro</span></div>
+    </div>
+    <div class="header-badge">China → Argentina</div>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="hero-tag">Herramienta profesional de importación</div>
+  <h1>Calculá tu costo real de<br/><em>importar desde China</em></h1>
+  <p>CIF, aranceles, IVA, honorarios de courier y margen de ganancia real para responsables inscriptos. Todos los números en un solo lugar.</p>
+</div>
+
+<main>
+  <!-- LEFT COLUMN: INPUTS -->
+  <div class="inputs-col">
+
+    <div class="card">
+      <div class="card-title">Producto</div>
+      <div class="field-grid">
+        <div class="field">
+          <label>Costo unitario en China (USD)</label>
+          <input type="number" id="unit_cost" value="10" min="0" step="0.01" />
+        </div>
+        <div class="field">
+          <label>Cantidad de unidades</label>
+          <input type="number" id="qty" value="50" min="1" step="1" />
+        </div>
+      </div>
+      <div class="derived-row">Costo total del producto: <span id="d-prod">USD 500.00</span></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Logística</div>
+      <div class="field-grid">
+        <div class="field">
+          <label>Costo de envío DAP (USD)</label>
+          <input type="number" id="ship" value="250" min="0" step="0.01" />
+        </div>
+        <div class="field">
+          <label>Seguro (%)</label>
+          <input type="number" id="ins" value="1" min="0" max="100" step="0.1" />
+          <span class="hint">sobre (producto + envío)</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Impuestos de importación</div>
+      <div class="field-grid three">
+        <div class="field">
+          <label>DE – Derecho importación (%)</label>
+          <input type="number" id="de" value="20" min="0" max="100" step="0.5" />
+        </div>
+        <div class="field">
+          <label>TE – Tasa estadística (%)</label>
+          <input type="number" id="te" value="3" min="0" max="100" step="0.5" />
+        </div>
+        <div class="field">
+          <label>IVA importación (%)</label>
+          <input type="number" id="iva" value="21" min="0" max="100" step="0.5" />
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Servicios y tipo de cambio</div>
+      <div class="field-grid">
+        <div class="field">
+          <label>Honorarios courier / trámites (USD)</label>
+          <input type="number" id="fees" value="80" min="0" step="1" />
+        </div>
+        <div class="field">
+          <label>Valor del dólar (ARS)</label>
+          <input type="number" id="fx" value="1500" min="1" step="1" />
+        </div>
+      </div>
+    </div>
+
+    <!-- MARGEN -->
+    <div class="margen-card">
+      <div class="card-title">Simulador de margen — Responsable Inscripto</div>
+
+      <div class="field-grid">
+        <div class="field">
+          <label>Precio de venta con IVA (ARS)</label>
+          <input type="number" id="pventa" value="" min="0" step="1" placeholder="Ej: 39899" />
+          <span class="hint">Lo que paga el cliente final</span>
+        </div>
+        <div class="field">
+          <label>IVA de venta (%)</label>
+          <input type="number" id="iva-venta" value="21" min="0" max="100" step="0.5" />
+        </div>
+      </div>
+
+      <div class="field-grid three" style="margin-top: 4px;">
+        <div class="field">
+          <label>Comisión plataforma (%)</label>
+          <input type="number" id="com-ml" value="14" min="0" max="100" step="0.5" />
+          <span class="hint">Ej: ML Classic 14%</span>
+        </div>
+        <div class="field">
+          <label>Costo de envío plataforma (ARS)</label>
+          <input type="number" id="envio-ml" value="0" min="0" step="100" />
+          <span class="hint">Si lo absorbés vos</span>
+        </div>
+        <div class="field">
+          <label>Costo por vender en cuotas (ARS)</label>
+          <input type="number" id="cuotas-ml" value="0" min="0" step="100" />
+          <span class="hint">Cargo financiero</span>
+        </div>
+      </div>
+
+      <div class="warning-neg" id="warning-neg">
+        ⚠ Estás vendiendo por debajo del costo — perdés plata en cada unidad.
+      </div>
+
+      <div class="margen-trio">
+        <div class="mt-box mt-ganancia">
+          <div class="mt-label">Ganancia real / unidad</div>
+          <div class="mt-value" id="m-gan">—</div>
+        </div>
+        <div class="mt-box mt-margen">
+          <div class="mt-label">Margen s/ venta</div>
+          <div class="mt-value" id="m-margen">—</div>
+        </div>
+        <div class="mt-box mt-markup">
+          <div class="mt-label">Markup s/ costo</div>
+          <div class="mt-value" id="m-markup">—</div>
+        </div>
+      </div>
+
+      <div class="breakdown">
+        <div class="brow sub"><span class="bl">Precio venta con IVA</span><span class="bv" id="mb-pventa">—</span></div>
+        <div class="brow sub"><span class="bl">− IVA débito fiscal</span><span class="bv" id="mb-deb">—</span></div>
+        <div class="brow"><span class="bl">= Venta neta (sin IVA)</span><span class="bv" id="mb-vneta">—</span></div>
+        <div class="brow sub"><span class="bl">− Costo importación neto</span><span class="bv" id="mb-cneto">—</span></div>
+        <div class="brow sub"><span class="bl">− Comisión plataforma neta<span class="badge" id="mb-com-pct">14%</span></span><span class="bv" id="mb-com">—</span></div>
+        <div class="brow sub"><span class="bl">− Envío plataforma neto</span><span class="bv" id="mb-envio">—</span></div>
+        <div class="brow sub"><span class="bl">− Cuotas neto</span><span class="bv" id="mb-cuotas">—</span></div>
+        <div class="brow total-row"><span class="bl">Ganancia real (neta)</span><span class="bv" id="mb-gnet">—</span></div>
+      </div>
+
+      <div class="precios-sug">
+        <div class="ps-title">Precios sugeridos según margen objetivo</div>
+        <div class="ps-grid">
+          <div class="ps-item">
+            <div class="ps-pct">20% margen</div>
+            <div class="ps-val" id="ps-20">—</div>
+          </div>
+          <div class="ps-item">
+            <div class="ps-pct">30% margen</div>
+            <div class="ps-val" id="ps-30">—</div>
+          </div>
+          <div class="ps-item">
+            <div class="ps-pct">40% margen</div>
+            <div class="ps-val" id="ps-40">—</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /inputs-col -->
+
+  <!-- RIGHT COLUMN: RESULTS -->
+  <div class="results-col">
+
+    <div class="unit-hero">
+      <div class="uh-label">Costo por unidad puesto en Argentina</div>
+      <div class="uh-usd" id="r-unit-usd">—</div>
+      <div class="uh-ars" id="r-unit-ars">—</div>
+    </div>
+
+    <div class="metric-grid">
+      <div class="metric-box">
+        <div class="mb-label">Valor CIF</div>
+        <div class="mb-value" id="r-cif">—</div>
+      </div>
+      <div class="metric-box">
+        <div class="mb-label">DE + TE</div>
+        <div class="mb-value" id="r-tax">—</div>
+      </div>
+      <div class="metric-box">
+        <div class="mb-label">IVA importación</div>
+        <div class="mb-value" id="r-iva">—</div>
+      </div>
+      <div class="metric-box">
+        <div class="mb-label">Total lote (USD)</div>
+        <div class="mb-value" id="r-total">—</div>
+      </div>
+    </div>
+
+    <div class="breakdown">
+      <div class="brow sub"><span class="bl">Costo unitario</span><span class="bv" id="b-uc">—</span></div>
+      <div class="brow sub"><span class="bl">× <span id="b-qty">50</span> unidades</span><span class="bv" id="b-pt">—</span></div>
+      <div class="brow sub"><span class="bl">+ Envío</span><span class="bv" id="b-ship">—</span></div>
+      <div class="brow sub"><span class="bl">+ Seguro<span class="badge" id="b-ins-pct">1%</span></span><span class="bv" id="b-ins">—</span></div>
+      <div class="brow"><span class="bl">= Valor CIF</span><span class="bv" id="b-cif">—</span></div>
+      <div class="brow sub"><span class="bl">+ DE<span class="badge" id="b-de-pct">20%</span></span><span class="bv" id="b-de">—</span></div>
+      <div class="brow sub"><span class="bl">+ TE<span class="badge" id="b-te-pct">3%</span></span><span class="bv" id="b-te">—</span></div>
+      <div class="brow"><span class="bl">= Base imponible</span><span class="bv" id="b-base">—</span></div>
+      <div class="brow sub"><span class="bl">+ IVA<span class="badge" id="b-iva-pct">21%</span></span><span class="bv" id="b-iva2">—</span></div>
+      <div class="brow sub"><span class="bl">+ Honorarios courier</span><span class="bv" id="b-fees">—</span></div>
+      <div class="brow total-row"><span class="bl">Total lote (USD)</span><span class="bv" id="b-tusd">—</span></div>
+      <div class="brow total-row"><span class="bl">Total lote (ARS)</span><span class="bv" id="b-tars">—</span></div>
+    </div>
+
+  </div><!-- /results-col -->
+</main>
+
+<footer>
+  <span>ArancelPro</span> — Calculadora de importación China → Argentina &nbsp;·&nbsp; Para uso informativo. Verificá los aranceles vigentes con tu despachante.
+</footer>
+
+<script>
+  function usd(n) { return 'USD\u00a0' + n.toFixed(2); }
+  function ars(n) { return '$\u00a0' + Math.round(n).toLocaleString('es-AR'); }
+  function pct(n) { return n.toFixed(1) + '%'; }
+
+  function calcImport() {
+    const uc   = parseFloat(document.getElementById('unit_cost').value) || 0;
+    const qty  = parseInt(document.getElementById('qty').value) || 1;
+    const ship = parseFloat(document.getElementById('ship').value) || 0;
+    const ins  = parseFloat(document.getElementById('ins').value) || 0;
+    const de   = parseFloat(document.getElementById('de').value) || 0;
+    const te   = parseFloat(document.getElementById('te').value) || 0;
+    const iva  = parseFloat(document.getElementById('iva').value) || 0;
+    const fees = parseFloat(document.getElementById('fees').value) || 0;
+    const fx   = parseFloat(document.getElementById('fx').value) || 1;
+
+    const prodTotal = uc * qty;
+    const fobShip   = prodTotal + ship;
+    const insAmt    = fobShip * ins / 100;
+    const cif       = fobShip + insAmt;
+    const deAmt     = cif * de / 100;
+    const teAmt     = cif * te / 100;
+    const baseImp   = cif + deAmt + teAmt;
+    const ivaAmt    = baseImp * iva / 100;
+    const total     = baseImp + ivaAmt + fees;
+    const perUnit   = total / qty;
+    const perUnitARS = perUnit * fx;
+
+    document.getElementById('d-prod').textContent     = usd(prodTotal);
+    document.getElementById('r-unit-usd').textContent = usd(perUnit);
+    document.getElementById('r-unit-ars').textContent = ars(perUnitARS);
+    document.getElementById('r-cif').textContent      = usd(cif);
+    document.getElementById('r-tax').textContent      = usd(deAmt + teAmt);
+    document.getElementById('r-iva').textContent      = usd(ivaAmt);
+    document.getElementById('r-total').textContent    = usd(total);
+    document.getElementById('b-uc').textContent       = usd(uc);
+    document.getElementById('b-qty').textContent      = qty;
+    document.getElementById('b-pt').textContent       = usd(prodTotal);
+    document.getElementById('b-ship').textContent     = usd(ship);
+    document.getElementById('b-ins').textContent      = usd(insAmt);
+    document.getElementById('b-ins-pct').textContent  = pct(ins);
+    document.getElementById('b-cif').textContent      = usd(cif);
+    document.getElementById('b-de').textContent       = usd(deAmt);
+    document.getElementById('b-de-pct').textContent   = pct(de);
+    document.getElementById('b-te').textContent       = usd(teAmt);
+    document.getElementById('b-te-pct').textContent   = pct(te);
+    document.getElementById('b-base').textContent     = usd(baseImp);
+    document.getElementById('b-iva2').textContent     = usd(ivaAmt);
+    document.getElementById('b-iva-pct').textContent  = pct(iva);
+    document.getElementById('b-fees').textContent     = usd(fees);
+    document.getElementById('b-tusd').textContent     = usd(total);
+    document.getElementById('b-tars').textContent     = ars(total * fx);
+
+    return { perUnitARS, iva };
+  }
+
+  function calcMargen(perUnitARS, ivaCompra) {
+    const pventa    = parseFloat(document.getElementById('pventa').value) || 0;
+    const ivaVenta  = parseFloat(document.getElementById('iva-venta').value) || 0;
+    const comML     = parseFloat(document.getElementById('com-ml').value) || 0;
+    const envioML   = parseFloat(document.getElementById('envio-ml').value) || 0;
+    const cuotasML  = parseFloat(document.getElementById('cuotas-ml').value) || 0;
+    const ids = ['m-gan','m-margen','m-markup','mb-pventa','mb-deb','mb-vneta',
+                 'mb-cneto','mb-com','mb-envio','mb-cuotas','mb-gnet','ps-20','ps-30','ps-40'];
+
+    if (!pventa) {
+      ids.forEach(id => document.getElementById(id).textContent = '—');
+      document.getElementById('warning-neg').style.display = 'none';
+      return;
+    }
+
+    const div       = 1 + ivaVenta / 100;
+    const ventaNeta = pventa / div;
+    const ivaDebito = pventa - ventaNeta;
+
+    // todos los costos se llevan a neto sin IVA (generan crédito fiscal para el RI)
+    const costoNeto  = perUnitARS / (1 + ivaCompra / 100);
+    const comNeto    = (pventa * comML / 100) / div;
+    const envioNeto  = envioML / div;
+    const cuotasNeto = cuotasML / div;
+
+    const totalCostos = costoNeto + comNeto + envioNeto + cuotasNeto;
+    const gan         = ventaNeta - totalCostos;
+    const margen      = ventaNeta > 0 ? (gan / ventaNeta) * 100 : 0;
+    const markup      = totalCostos > 0 ? (gan / totalCostos) * 100 : 0;
+    const isNeg       = gan < 0;
+
+    document.getElementById('warning-neg').style.display = isNeg ? 'block' : 'none';
+
+    const ganEl = document.getElementById('m-gan');
+    ganEl.textContent = ars(gan);
+    ganEl.closest('.mt-box').style.background  = isNeg ? 'var(--danger-bg)' : 'var(--accent-bg)';
+    ganEl.closest('.mt-box').style.borderColor = isNeg ? 'rgba(255,92,92,0.2)' : 'rgba(0,200,150,0.15)';
+    ganEl.style.color = isNeg ? 'var(--danger)' : 'var(--accent)';
+
+    document.getElementById('m-margen').textContent   = pct(margen);
+    document.getElementById('m-markup').textContent   = pct(markup);
+    document.getElementById('mb-pventa').textContent  = ars(pventa);
+    document.getElementById('mb-deb').textContent     = ars(ivaDebito);
+    document.getElementById('mb-vneta').textContent   = ars(ventaNeta);
+    document.getElementById('mb-cneto').textContent   = ars(costoNeto);
+    document.getElementById('mb-com').textContent     = ars(comNeto);
+    document.getElementById('mb-com-pct').textContent = pct(comML);
+    document.getElementById('mb-envio').textContent   = ars(envioNeto);
+    document.getElementById('mb-cuotas').textContent  = ars(cuotasNeto);
+    const gNetEl = document.getElementById('mb-gnet');
+    gNetEl.textContent = ars(gan);
+    gNetEl.style.color = isNeg ? 'var(--danger)' : 'var(--accent)';
+
+    // precio sugerido: costos fijos netos / (1 - comML% - margenObj%) * (1+IVA)
+    const pvFor = m => {
+      const comRate = comML / 100;
+      const denom   = 1 - comRate - m / 100;
+      if (denom <= 0) return 0;
+      return (costoNeto + envioNeto + cuotasNeto) / denom * div;
+    };
+    document.getElementById('ps-20').textContent = ars(pvFor(20));
+    document.getElementById('ps-30').textContent = ars(pvFor(30));
+    document.getElementById('ps-40').textContent = ars(pvFor(40));
+  }
+
+  function calc() {
+    const { perUnitARS, iva } = calcImport();
+    calcMargen(perUnitARS, iva);
+  }
+
+  document.querySelectorAll('input').forEach(el => el.addEventListener('input', calc));
+  calc();
+</script>
+</body>
+</html>
