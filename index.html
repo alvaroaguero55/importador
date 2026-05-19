@@ -36,6 +36,40 @@
     --radius-lg: 14px;
   }
 
+
+  /* ── COURIER PAYMENT BOX ── */
+  .courier-box {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(135deg, rgba(74,158,255,0.1), rgba(74,158,255,0.03));
+    border: 1px solid rgba(74,158,255,0.25);
+    border-radius: var(--radius-lg);
+    padding: 1rem 1.25rem;
+    margin-bottom: 10px;
+    gap: 12px;
+  }
+  .cb-left { flex: 1; }
+  .cb-label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--blue);
+    margin-bottom: 4px;
+  }
+  .cb-sub { font-size: 11px; color: var(--text-3); line-height: 1.4; }
+  .cb-right { text-align: right; flex-shrink: 0; }
+  .cb-usd {
+    font-family: var(--mono);
+    font-size: 22px;
+    font-weight: 500;
+    color: var(--blue);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .cb-ars { font-family: var(--mono); font-size: 15px; color: var(--text-2); }
+
   html { scroll-behavior: smooth; }
 
   body {
@@ -146,17 +180,13 @@
 
   /* ── LAYOUT ── */
   main {
-    max-width: 960px;
+    max-width: 720px;
     margin: 0 auto;
     padding: 2.5rem 2rem 5rem;
-    display: grid;
-    grid-template-columns: 1fr 340px;
-    gap: 1.5rem;
-    align-items: start;
   }
 
   @media (max-width: 760px) {
-    main { grid-template-columns: 1fr; padding: 1.5rem 1rem 4rem; }
+    main { padding: 1.5rem 1rem 4rem; }
     .hero { padding: 2rem 1rem 1.5rem; }
     header { padding: 0 1rem; }
   }
@@ -379,7 +409,95 @@
   }
   footer span { color: var(--text-2); }
 
-  /* ── SCROLLBAR ── */
+  /* ── COLLAPSIBLE SECTIONS ── */
+  .section-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    padding: 1rem 1.25rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border-md);
+    border-radius: var(--radius-lg);
+    margin-bottom: 1rem;
+    user-select: none;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .section-toggle:hover {
+    background: var(--bg-hover);
+    border-color: rgba(255,255,255,0.16);
+  }
+  .section-toggle-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .section-toggle-num {
+    width: 26px;
+    height: 26px;
+    border-radius: 7px;
+    background: var(--accent-bg);
+    border: 1px solid rgba(0,200,150,0.2);
+    color: var(--accent);
+    font-size: 12px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--mono);
+    flex-shrink: 0;
+  }
+  .section-toggle-num.blue {
+    background: var(--blue-bg);
+    border-color: rgba(74,158,255,0.2);
+    color: var(--blue);
+  }
+  .section-toggle-info { display: flex; flex-direction: column; gap: 2px; }
+  .section-toggle-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-1);
+    line-height: 1.2;
+  }
+  .section-toggle-sub {
+    font-size: 11px;
+    color: var(--text-3);
+  }
+  .section-toggle-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-pill {
+    font-size: 11px;
+    font-family: var(--mono);
+    padding: 3px 8px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    color: var(--text-3);
+    background: var(--bg-input);
+    white-space: nowrap;
+  }
+  .section-chevron {
+    width: 20px;
+    height: 20px;
+    color: var(--text-3);
+    transition: transform 0.25s cubic-bezier(0.4,0,0.2,1);
+    flex-shrink: 0;
+  }
+  .section-chevron.open { transform: rotate(180deg); }
+
+  .section-body {
+    overflow: hidden;
+    transition: max-height 0.35s cubic-bezier(0.4,0,0.2,1), opacity 0.25s ease;
+    max-height: 3000px;
+    opacity: 1;
+  }
+  .section-body.collapsed {
+    max-height: 0;
+    opacity: 0;
+    pointer-events: none;
+  }
   ::-webkit-scrollbar { width: 6px; }
   ::-webkit-scrollbar-track { background: var(--bg); }
   ::-webkit-scrollbar-thumb { background: var(--border-md); border-radius: 3px; }
@@ -408,6 +526,22 @@
 <main>
   <!-- LEFT COLUMN: INPUTS -->
   <div class="inputs-col">
+
+    <!-- SECCIÓN 1: IMPORTACIÓN -->
+    <div class="section-toggle" onclick="toggleSection('import')" id="toggle-import">
+      <div class="section-toggle-left">
+        <div class="section-toggle-num">1</div>
+        <div class="section-toggle-info">
+          <div class="section-toggle-title">Costo de importación</div>
+          <div class="section-toggle-sub">Producto puesto en Argentina desde China</div>
+        </div>
+      </div>
+      <div class="section-toggle-right">
+        <div class="section-pill" id="pill-import">—</div>
+        <svg class="section-chevron open" id="chevron-import" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="5 8 10 13 15 8"/></svg>
+      </div>
+    </div>
+    <div class="section-body" id="body-import">
 
     <div class="card">
       <div class="card-title">Producto</div>
@@ -448,21 +582,28 @@
         </div>
         <div class="field">
           <label>TE – Tasa estadística (%)</label>
-          <input type="number" id="te" value="3" min="0" max="100" step="0.5" />
+          <input type="number" id="te" value="0.5" min="0" max="100" step="0.5" />
         </div>
         <div class="field">
           <label>IVA importación (%)</label>
-          <input type="number" id="iva" value="21" min="0" max="100" step="0.5" />
+          <input type="number" id="iva" value="10.5" min="0" max="100" step="0.5" />
+          <span class="hint">Courier/importación: 10.5% — otros: 21%</span>
         </div>
       </div>
     </div>
 
     <div class="card">
       <div class="card-title">Servicios y tipo de cambio</div>
-      <div class="field-grid">
+      <div class="field-grid three">
         <div class="field">
           <label>Honorarios courier / trámites (USD)</label>
-          <input type="number" id="fees" value="80" min="0" step="1" />
+          <input type="number" id="fees" value="15" min="0" step="1" />
+          <span class="hint">Sin IVA (ej: DHL processing = 15)</span>
+        </div>
+        <div class="field">
+          <label>IVA sobre honorarios (%)</label>
+          <input type="number" id="iva-fees" value="21" min="0" max="100" step="0.5" />
+          <span class="hint">Courier aplica 21% sobre honorarios</span>
         </div>
         <div class="field">
           <label>Valor del dólar (ARS)</label>
@@ -471,9 +612,96 @@
       </div>
     </div>
 
-    <!-- MARGEN -->
+    <!-- RESULTADOS IMPORTACIÓN -->
+    <div class="unit-hero">
+      <div class="uh-label">Costo por unidad puesto en Argentina</div>
+      <div class="uh-usd" id="r-unit-usd">—</div>
+      <div class="uh-ars" id="r-unit-ars">—</div>
+    </div>
+
+    <!-- CAJA GASTOS COURIER/ADUANA -->
+    <div class="courier-box">
+      <div class="cb-left">
+        <div class="cb-label">Gastos courier / aduana a pagar</div>
+        <div class="cb-sub">Derechos + IVA mercad&iacute;a + honorarios + IVA hon.</div>
+      </div>
+      <div class="cb-right">
+        <div class="cb-usd" id="r-courier-usd">—</div>
+        <div class="cb-ars" id="r-courier-ars">—</div>
+      </div>
+    </div>
+
+    <div class="metric-grid">
+      <div class="metric-box">
+        <div class="mb-label">Valor CIF</div>
+        <div class="mb-value" id="r-cif">—</div>
+      </div>
+      <div class="metric-box">
+        <div class="mb-label">DE + TE</div>
+        <div class="mb-value" id="r-tax">—</div>
+      </div>
+      <div class="metric-box">
+        <div class="mb-label">IVA importación</div>
+        <div class="mb-value" id="r-iva">—</div>
+      </div>
+      <div class="metric-box">
+        <div class="mb-label">Total lote (USD)</div>
+        <div class="mb-value" id="r-total">—</div>
+      </div>
+    </div>
+
+    <div class="breakdown" style="margin-bottom:0;">
+      <div class="brow sub"><span class="bl">Costo unitario</span><span class="bv" id="b-uc">—</span></div>
+      <div class="brow sub"><span class="bl">× <span id="b-qty">50</span> unidades</span><span class="bv" id="b-pt">—</span></div>
+      <div class="brow sub"><span class="bl">+ Envío</span><span class="bv" id="b-ship">—</span></div>
+      <div class="brow sub"><span class="bl">+ Seguro<span class="badge" id="b-ins-pct">1%</span></span><span class="bv" id="b-ins">—</span></div>
+      <div class="brow"><span class="bl">= Valor CIF</span><span class="bv" id="b-cif">—</span></div>
+      <div class="brow sub"><span class="bl">+ DE<span class="badge" id="b-de-pct">20%</span></span><span class="bv" id="b-de">—</span></div>
+      <div class="brow sub"><span class="bl">+ TE<span class="badge" id="b-te-pct">3%</span></span><span class="bv" id="b-te">—</span></div>
+      <div class="brow"><span class="bl">= Base imponible</span><span class="bv" id="b-base">—</span></div>
+      <div class="brow sub"><span class="bl">+ IVA<span class="badge" id="b-iva-pct">21%</span></span><span class="bv" id="b-iva2">—</span></div>
+      <div class="brow sub"><span class="bl">+ Honorarios courier (neto)</span><span class="bv" id="b-fees">—</span></div>
+      <div class="brow sub"><span class="bl">+ IVA honorarios<span class="badge" id="b-fees-iva-pct">21%</span></span><span class="bv" id="b-fees-iva">—</span></div>
+      <div class="brow total-row"><span class="bl">Total lote (USD)</span><span class="bv" id="b-tusd">—</span></div>
+      <div class="brow total-row"><span class="bl">Total lote (ARS)</span><span class="bv" id="b-tars">—</span></div>
+    </div>
+
+    </div><!-- /body-import -->
+
+    <!-- SECCIÓN 2: MARGEN ML -->
+    <div class="section-toggle" onclick="toggleSection('margen')" id="toggle-margen">
+      <div class="section-toggle-left">
+        <div class="section-toggle-num blue">2</div>
+        <div class="section-toggle-info">
+          <div class="section-toggle-title">Margen de venta</div>
+          <div class="section-toggle-sub">Simulador para Mercado Libre — Responsable Inscripto</div>
+        </div>
+      </div>
+      <div class="section-toggle-right">
+        <div class="section-pill" id="pill-margen">—</div>
+        <svg class="section-chevron open" id="chevron-margen" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="5 8 10 13 15 8"/></svg>
+      </div>
+    </div>
+    <div class="section-body" id="body-margen">
+
     <div class="margen-card">
       <div class="card-title">Simulador de margen — Responsable Inscripto</div>
+
+      <div class="field-grid">
+        <div class="field">
+          <label>Costo unitario con IVA (ARS)</label>
+          <div style="position:relative;">
+            <input type="number" id="costo-manual" min="0" step="1" placeholder="Se toma de la calculadora" />
+            <button onclick="resetCostoManual()" id="btn-reset" title="Sincronizar con calculadora" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--accent);font-size:13px;padding:2px 4px;display:none;">↺ sync</button>
+          </div>
+          <span class="hint" id="costo-hint">Tomado de la calculadora — editá para comparar otro producto</span>
+        </div>
+        <div class="field">
+          <label>IVA de compra (%)</label>
+          <input type="number" id="iva-compra-man" value="21" min="0" max="100" step="0.5" />
+          <span class="hint">Generalmente igual al IVA de importación</span>
+        </div>
+      </div>
 
       <div class="field-grid">
         <div class="field">
@@ -552,54 +780,11 @@
           </div>
         </div>
       </div>
-    </div>
+
+    </div><!-- /margen-card -->
+    </div><!-- /body-margen -->
 
   </div><!-- /inputs-col -->
-
-  <!-- RIGHT COLUMN: RESULTS -->
-  <div class="results-col">
-
-    <div class="unit-hero">
-      <div class="uh-label">Costo por unidad puesto en Argentina</div>
-      <div class="uh-usd" id="r-unit-usd">—</div>
-      <div class="uh-ars" id="r-unit-ars">—</div>
-    </div>
-
-    <div class="metric-grid">
-      <div class="metric-box">
-        <div class="mb-label">Valor CIF</div>
-        <div class="mb-value" id="r-cif">—</div>
-      </div>
-      <div class="metric-box">
-        <div class="mb-label">DE + TE</div>
-        <div class="mb-value" id="r-tax">—</div>
-      </div>
-      <div class="metric-box">
-        <div class="mb-label">IVA importación</div>
-        <div class="mb-value" id="r-iva">—</div>
-      </div>
-      <div class="metric-box">
-        <div class="mb-label">Total lote (USD)</div>
-        <div class="mb-value" id="r-total">—</div>
-      </div>
-    </div>
-
-    <div class="breakdown">
-      <div class="brow sub"><span class="bl">Costo unitario</span><span class="bv" id="b-uc">—</span></div>
-      <div class="brow sub"><span class="bl">× <span id="b-qty">50</span> unidades</span><span class="bv" id="b-pt">—</span></div>
-      <div class="brow sub"><span class="bl">+ Envío</span><span class="bv" id="b-ship">—</span></div>
-      <div class="brow sub"><span class="bl">+ Seguro<span class="badge" id="b-ins-pct">1%</span></span><span class="bv" id="b-ins">—</span></div>
-      <div class="brow"><span class="bl">= Valor CIF</span><span class="bv" id="b-cif">—</span></div>
-      <div class="brow sub"><span class="bl">+ DE<span class="badge" id="b-de-pct">20%</span></span><span class="bv" id="b-de">—</span></div>
-      <div class="brow sub"><span class="bl">+ TE<span class="badge" id="b-te-pct">3%</span></span><span class="bv" id="b-te">—</span></div>
-      <div class="brow"><span class="bl">= Base imponible</span><span class="bv" id="b-base">—</span></div>
-      <div class="brow sub"><span class="bl">+ IVA<span class="badge" id="b-iva-pct">21%</span></span><span class="bv" id="b-iva2">—</span></div>
-      <div class="brow sub"><span class="bl">+ Honorarios courier</span><span class="bv" id="b-fees">—</span></div>
-      <div class="brow total-row"><span class="bl">Total lote (USD)</span><span class="bv" id="b-tusd">—</span></div>
-      <div class="brow total-row"><span class="bl">Total lote (ARS)</span><span class="bv" id="b-tars">—</span></div>
-    </div>
-
-  </div><!-- /results-col -->
 </main>
 
 <footer>
@@ -611,6 +796,27 @@
   function ars(n) { return '$\u00a0' + Math.round(n).toLocaleString('es-AR'); }
   function pct(n) { return n.toFixed(1) + '%'; }
 
+  function toggleSection(id) {
+    const body    = document.getElementById('body-' + id);
+    const chevron = document.getElementById('chevron-' + id);
+    const isOpen  = !body.classList.contains('collapsed');
+    body.classList.toggle('collapsed', isOpen);
+    chevron.classList.toggle('open', !isOpen);
+  }
+
+  let costoFromCalc = 0;   // valor calculado, para poder resetear
+  let userEditedCosto = false;
+
+  function resetCostoManual() {
+    userEditedCosto = false;
+    const el = document.getElementById('costo-manual');
+    el.value = costoFromCalc.toFixed(0);
+    el.style.borderColor = '';
+    document.getElementById('btn-reset').style.display = 'none';
+    document.getElementById('costo-hint').textContent = 'Tomado de la calculadora — editá para comparar otro producto';
+    calc();
+  }
+
   function calcImport() {
     const uc   = parseFloat(document.getElementById('unit_cost').value) || 0;
     const qty  = parseInt(document.getElementById('qty').value) || 1;
@@ -620,6 +826,7 @@
     const te   = parseFloat(document.getElementById('te').value) || 0;
     const iva  = parseFloat(document.getElementById('iva').value) || 0;
     const fees = parseFloat(document.getElementById('fees').value) || 0;
+    const ivaFeesPct = parseFloat(document.getElementById('iva-fees').value) || 0;
     const fx   = parseFloat(document.getElementById('fx').value) || 1;
 
     const prodTotal = uc * qty;
@@ -630,16 +837,27 @@
     const teAmt     = cif * te / 100;
     const baseImp   = cif + deAmt + teAmt;
     const ivaAmt    = baseImp * iva / 100;
-    const total     = baseImp + ivaAmt + fees;
+    const feesIvaAmt = fees * ivaFeesPct / 100;
+    const total       = baseImp + ivaAmt + fees + feesIvaAmt;
+    // Lo que efectivamente se paga al courier/aduana (no incluye el FOB de la mercadería)
+    const courierTotal = deAmt + teAmt + ivaAmt + fees + feesIvaAmt;
     const perUnit   = total / qty;
     const perUnitARS = perUnit * fx;
+
+    // sync costo field si el usuario no lo editó manualmente
+    costoFromCalc = perUnitARS;
+    if (!userEditedCosto) {
+      document.getElementById('costo-manual').value = perUnitARS.toFixed(0);
+      document.getElementById('iva-compra-man').value = iva.toFixed(1);
+    }
 
     document.getElementById('d-prod').textContent     = usd(prodTotal);
     document.getElementById('r-unit-usd').textContent = usd(perUnit);
     document.getElementById('r-unit-ars').textContent = ars(perUnitARS);
+    document.getElementById('pill-import').textContent = usd(perUnit) + ' / u';
     document.getElementById('r-cif').textContent      = usd(cif);
     document.getElementById('r-tax').textContent      = usd(deAmt + teAmt);
-    document.getElementById('r-iva').textContent      = usd(ivaAmt);
+    document.getElementById('r-iva').textContent      = usd(ivaAmt + feesIvaAmt);
     document.getElementById('r-total').textContent    = usd(total);
     document.getElementById('b-uc').textContent       = usd(uc);
     document.getElementById('b-qty').textContent      = qty;
@@ -656,18 +874,24 @@
     document.getElementById('b-iva2').textContent     = usd(ivaAmt);
     document.getElementById('b-iva-pct').textContent  = pct(iva);
     document.getElementById('b-fees').textContent     = usd(fees);
+    document.getElementById('b-fees-iva').textContent    = usd(feesIvaAmt);
+    document.getElementById('b-fees-iva-pct').textContent = pct(ivaFeesPct);
     document.getElementById('b-tusd').textContent     = usd(total);
     document.getElementById('b-tars').textContent     = ars(total * fx);
+    document.getElementById('r-courier-usd').textContent = usd(courierTotal);
+    document.getElementById('r-courier-ars').textContent = ars(courierTotal * fx);
 
     return { perUnitARS, iva };
   }
 
-  function calcMargen(perUnitARS, ivaCompra) {
-    const pventa    = parseFloat(document.getElementById('pventa').value) || 0;
-    const ivaVenta  = parseFloat(document.getElementById('iva-venta').value) || 0;
-    const comML     = parseFloat(document.getElementById('com-ml').value) || 0;
-    const envioML   = parseFloat(document.getElementById('envio-ml').value) || 0;
-    const cuotasML  = parseFloat(document.getElementById('cuotas-ml').value) || 0;
+  function calcMargen() {
+    const perUnitARS = parseFloat(document.getElementById('costo-manual').value) || 0;
+    const ivaCompra  = parseFloat(document.getElementById('iva-compra-man').value) || 0;
+    const pventa     = parseFloat(document.getElementById('pventa').value) || 0;
+    const ivaVenta   = parseFloat(document.getElementById('iva-venta').value) || 0;
+    const comML      = parseFloat(document.getElementById('com-ml').value) || 0;
+    const envioML    = parseFloat(document.getElementById('envio-ml').value) || 0;
+    const cuotasML   = parseFloat(document.getElementById('cuotas-ml').value) || 0;
     const ids = ['m-gan','m-margen','m-markup','mb-pventa','mb-deb','mb-vneta',
                  'mb-cneto','mb-com','mb-envio','mb-cuotas','mb-gnet','ps-20','ps-30','ps-40'];
 
@@ -677,16 +901,13 @@
       return;
     }
 
-    const div       = 1 + ivaVenta / 100;
-    const ventaNeta = pventa / div;
-    const ivaDebito = pventa - ventaNeta;
-
-    // todos los costos se llevan a neto sin IVA (generan crédito fiscal para el RI)
+    const div        = 1 + ivaVenta / 100;
+    const ventaNeta  = pventa / div;
+    const ivaDebito  = pventa - ventaNeta;
     const costoNeto  = perUnitARS / (1 + ivaCompra / 100);
     const comNeto    = (pventa * comML / 100) / div;
     const envioNeto  = envioML / div;
     const cuotasNeto = cuotasML / div;
-
     const totalCostos = costoNeto + comNeto + envioNeto + cuotasNeto;
     const gan         = ventaNeta - totalCostos;
     const margen      = ventaNeta > 0 ? (gan / ventaNeta) * 100 : 0;
@@ -715,7 +936,11 @@
     gNetEl.textContent = ars(gan);
     gNetEl.style.color = isNeg ? 'var(--danger)' : 'var(--accent)';
 
-    // precio sugerido: costos fijos netos / (1 - comML% - margenObj%) * (1+IVA)
+    const pillM = document.getElementById('pill-margen');
+    pillM.textContent = pct(margen) + ' margen';
+    pillM.style.color = isNeg ? 'var(--danger)' : 'var(--accent)';
+    pillM.style.borderColor = isNeg ? 'rgba(255,92,92,0.3)' : 'rgba(0,200,150,0.3)';
+
     const pvFor = m => {
       const comRate = comML / 100;
       const denom   = 1 - comRate - m / 100;
@@ -728,11 +953,23 @@
   }
 
   function calc() {
-    const { perUnitARS, iva } = calcImport();
-    calcMargen(perUnitARS, iva);
+    calcImport();
+    calcMargen();
   }
 
-  document.querySelectorAll('input').forEach(el => el.addEventListener('input', calc));
+  // detectar edición manual del campo costo
+  document.getElementById('costo-manual').addEventListener('input', function() {
+    const val = parseFloat(this.value);
+    if (!isNaN(val) && Math.abs(val - costoFromCalc) > 1) {
+      userEditedCosto = true;
+      this.style.borderColor = 'var(--amber)';
+      document.getElementById('btn-reset').style.display = 'block';
+      document.getElementById('costo-hint').textContent = 'Editado manualmente — presioná ↺ sync para volver al valor calculado';
+    }
+    calcMargen();
+  });
+
+  document.querySelectorAll('input:not(#costo-manual)').forEach(el => el.addEventListener('input', calc));
   calc();
 </script>
 </body>
