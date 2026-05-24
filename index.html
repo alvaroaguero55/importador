@@ -36,40 +36,6 @@
     --radius-lg: 14px;
   }
 
-
-  /* ── COURIER PAYMENT BOX ── */
-  .courier-box {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: linear-gradient(135deg, rgba(74,158,255,0.1), rgba(74,158,255,0.03));
-    border: 1px solid rgba(74,158,255,0.25);
-    border-radius: var(--radius-lg);
-    padding: 1rem 1.25rem;
-    margin-bottom: 10px;
-    gap: 12px;
-  }
-  .cb-left { flex: 1; }
-  .cb-label {
-    font-size: 11px;
-    font-weight: 500;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--blue);
-    margin-bottom: 4px;
-  }
-  .cb-sub { font-size: 11px; color: var(--text-3); line-height: 1.4; }
-  .cb-right { text-align: right; flex-shrink: 0; }
-  .cb-usd {
-    font-family: var(--mono);
-    font-size: 22px;
-    font-weight: 500;
-    color: var(--blue);
-    line-height: 1;
-    margin-bottom: 4px;
-  }
-  .cb-ars { font-family: var(--mono); font-size: 15px; color: var(--text-2); }
-
   html { scroll-behavior: smooth; }
 
   body {
@@ -501,6 +467,51 @@
   ::-webkit-scrollbar { width: 6px; }
   ::-webkit-scrollbar-track { background: var(--bg); }
   ::-webkit-scrollbar-thumb { background: var(--border-md); border-radius: 3px; }
+
+  .brow .bv.negative { color: var(--danger) !important; }
+
+  /* ── ESCENARIOS TABLE ── */
+  #ec-escenarios tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; }
+  #ec-escenarios tbody tr:last-child { border-bottom: none; }
+  #ec-escenarios tbody tr:hover { background: var(--bg-hover); }
+  #ec-escenarios td { padding: 10px 6px; vertical-align: middle; }
+  #ec-escenarios td:first-child { padding-left: 10px; }
+  #ec-escenarios td:last-child { padding-right: 10px; text-align: right; font-family: var(--mono); }
+  #ec-escenarios td:nth-child(2) { text-align: center; font-family: var(--mono); }
+  #ec-escenarios td:nth-child(3),
+  #ec-escenarios td:nth-child(4) { text-align: right; font-family: var(--mono); }
+  .esc-badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 3px 7px;
+    border-radius: 5px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+  }
+
+  /* ── EC TOGGLE BUTTONS ── */
+  .ec-toggle-btn {
+    flex: 1;
+    padding: 8px 10px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    background: var(--bg-input);
+    color: var(--text-2);
+    font-family: var(--font);
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .ec-toggle-btn:hover { border-color: var(--border-md); color: var(--text-1); }
+  .ec-toggle-btn.active {
+    background: var(--accent-bg);
+    border-color: rgba(0,200,150,0.3);
+    color: var(--accent);
+    font-weight: 500;
+  }
 </style>
 </head>
 <body>
@@ -582,12 +593,11 @@
         </div>
         <div class="field">
           <label>TE – Tasa estadística (%)</label>
-          <input type="number" id="te" value="0.5" min="0" max="100" step="0.5" />
+          <input type="number" id="te" value="3" min="0" max="100" step="0.5" />
         </div>
         <div class="field">
           <label>IVA importación (%)</label>
-          <input type="number" id="iva" value="10.5" min="0" max="100" step="0.5" />
-          <span class="hint">Courier/importación: 10.5% — otros: 21%</span>
+          <input type="number" id="iva" value="21" min="0" max="100" step="0.5" />
         </div>
       </div>
     </div>
@@ -597,12 +607,12 @@
       <div class="field-grid three">
         <div class="field">
           <label>Honorarios courier / trámites (USD)</label>
-          <input type="number" id="fees" value="15" min="0" step="1" />
-          <span class="hint">Sin IVA (ej: DHL processing = 15)</span>
+          <input type="number" id="fees" value="80" min="0" step="1" />
+          <span class="hint">Sin IVA (neto)</span>
         </div>
         <div class="field">
           <label>IVA sobre honorarios (%)</label>
-          <input type="number" id="iva-fees" value="21" min="0" max="100" step="0.5" />
+          <input type="number" id="fees-iva" value="21" min="0" max="100" step="0.5" />
           <span class="hint">Courier aplica 21% sobre honorarios</span>
         </div>
         <div class="field">
@@ -612,23 +622,23 @@
       </div>
     </div>
 
+    <!-- GASTOS COURIER / ADUANA A PAGAR -->
+    <div style="background:rgba(0,200,150,0.06);border:1px solid rgba(0,200,150,0.18);border-radius:var(--radius-lg);padding:14px 16px;margin-bottom:1rem;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+        <span style="font-size:11px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;color:var(--accent);">Gastos courier / aduana a pagar</span>
+        <div style="text-align:right;">
+          <div style="font-family:var(--mono);font-size:18px;font-weight:500;color:var(--accent);" id="r-courier-usd">—</div>
+          <div style="font-family:var(--mono);font-size:13px;color:var(--text-2);" id="r-courier-ars">—</div>
+        </div>
+      </div>
+      <div style="font-size:11px;color:var(--text-3);">Derechos + IVA mercadería + Honorarios + IVA hon.</div>
+    </div>
+
     <!-- RESULTADOS IMPORTACIÓN -->
     <div class="unit-hero">
       <div class="uh-label">Costo por unidad puesto en Argentina</div>
       <div class="uh-usd" id="r-unit-usd">—</div>
       <div class="uh-ars" id="r-unit-ars">—</div>
-    </div>
-
-    <!-- CAJA GASTOS COURIER/ADUANA -->
-    <div class="courier-box">
-      <div class="cb-left">
-        <div class="cb-label">Gastos courier / aduana a pagar</div>
-        <div class="cb-sub">Derechos + IVA mercad&iacute;a + honorarios + IVA hon.</div>
-      </div>
-      <div class="cb-right">
-        <div class="cb-usd" id="r-courier-usd">—</div>
-        <div class="cb-ars" id="r-courier-ars">—</div>
-      </div>
     </div>
 
     <div class="metric-grid">
@@ -660,7 +670,7 @@
       <div class="brow sub"><span class="bl">+ TE<span class="badge" id="b-te-pct">3%</span></span><span class="bv" id="b-te">—</span></div>
       <div class="brow"><span class="bl">= Base imponible</span><span class="bv" id="b-base">—</span></div>
       <div class="brow sub"><span class="bl">+ IVA<span class="badge" id="b-iva-pct">21%</span></span><span class="bv" id="b-iva2">—</span></div>
-      <div class="brow sub"><span class="bl">+ Honorarios courier (neto)</span><span class="bv" id="b-fees">—</span></div>
+      <div class="brow sub"><span class="bl">+ Honorarios courier</span><span class="bv" id="b-fees">—</span></div>
       <div class="brow sub"><span class="bl">+ IVA honorarios<span class="badge" id="b-fees-iva-pct">21%</span></span><span class="bv" id="b-fees-iva">—</span></div>
       <div class="brow total-row"><span class="bl">Total lote (USD)</span><span class="bv" id="b-tusd">—</span></div>
       <div class="brow total-row"><span class="bl">Total lote (ARS)</span><span class="bv" id="b-tars">—</span></div>
@@ -784,6 +794,277 @@
     </div><!-- /margen-card -->
     </div><!-- /body-margen -->
 
+    <!-- SECCIÓN 3: ECOMMERCE -->
+    <div class="section-toggle" onclick="toggleSection('ecom')" id="toggle-ecom">
+      <div class="section-toggle-left">
+        <div class="section-toggle-num" style="background:rgba(245,166,35,0.1);border-color:rgba(245,166,35,0.2);color:var(--amber);">3</div>
+        <div class="section-toggle-info">
+          <div class="section-toggle-title">Rentabilidad Ecommerce</div>
+          <div class="section-toggle-sub">Tiendanube / Shopify — Pasarela de pago y cuotas</div>
+        </div>
+      </div>
+      <div class="section-toggle-right">
+        <div class="section-pill" id="pill-ecom">—</div>
+        <svg class="section-chevron open" id="chevron-ecom" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="5 8 10 13 15 8"/></svg>
+      </div>
+    </div>
+    <div class="section-body" id="body-ecom">
+    <div class="margen-card">
+
+      <!-- PRECIO Y COSTO -->
+      <div class="card-title">Precio y costo del producto</div>
+      <div class="field-grid">
+        <div class="field">
+          <label>Precio de venta con IVA (ARS)</label>
+          <input type="number" id="ec-pventa" min="0" step="1" placeholder="Ej: 49899" />
+          <span class="hint">Lo que paga el cliente</span>
+        </div>
+        <div class="field">
+          <label>IVA de venta (%)</label>
+          <input type="number" id="ec-iva-venta" value="21" min="0" max="100" step="0.5" />
+        </div>
+      </div>
+      <div class="field-grid">
+        <div class="field">
+          <label>Costo del producto con IVA (ARS)</label>
+          <div style="position:relative;">
+            <input type="number" id="ec-costo" min="0" step="1" placeholder="Tomado de la calculadora" />
+            <button onclick="resetEcCosto()" id="ec-btn-reset" title="Sincronizar con calculadora" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--accent);font-size:13px;padding:2px 4px;display:none;">↺ sync</button>
+          </div>
+          <span class="hint" id="ec-costo-hint">Tomado de la calculadora — editá para otro producto</span>
+        </div>
+        <div class="field">
+          <label>IVA de compra (%)</label>
+          <input type="number" id="ec-iva-compra" value="21" min="0" max="100" step="0.5" />
+        </div>
+      </div>
+
+      <div class="card-title" style="margin-top:1.25rem;">Plataforma e-commerce</div>
+
+      <!-- PLATFORM TOGGLE -->
+      <div style="display:flex;gap:6px;margin-bottom:12px;" id="ec-platform-btns">
+        <button class="ec-toggle-btn active" onclick="setPlatform('tiendanube')" id="pb-tiendanube">Tiendanube</button>
+        <button class="ec-toggle-btn" onclick="setPlatform('shopify')" id="pb-shopify">Shopify</button>
+        <button class="ec-toggle-btn" onclick="setPlatform('otra')" id="pb-otra">Otra</button>
+      </div>
+      <div class="derived-row" id="ec-platform-note" style="margin-bottom:12px;">
+        Tiendanube cobra <span>2% extra</span> sobre el monto de venta si usás pasarela externa (MP, Stripe, etc.)
+      </div>
+
+      <div class="card-title" style="margin-top:1.25rem;">Pasarela de pago</div>
+
+      <!-- GATEWAY TOGGLE -->
+      <div style="display:flex;gap:6px;margin-bottom:12px;" id="ec-gateway-btns">
+        <button class="ec-toggle-btn" onclick="setGateway('pagoNube')" id="gb-pagoNube">Pago Nube</button>
+        <button class="ec-toggle-btn active" onclick="setGateway('mp')" id="gb-mp">Mercado Pago</button>
+        <button class="ec-toggle-btn" onclick="setGateway('custom')" id="gb-custom">Personalizada</button>
+      </div>
+
+      <!-- MP acreditación -->
+      <div id="ec-mp-acred" style="margin-bottom:10px;">
+        <div class="field" style="margin-bottom:10px;">
+          <label>Acreditación (tiempo de cobro)</label>
+          <select id="ec-mp-timing" onchange="setMpTiming()" style="background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius);color:var(--text-1);font-size:14px;padding:9px 12px;outline:none;width:100%;font-family:var(--font);">
+            <option value="6.29">En el momento — 6.29% + IVA</option>
+            <option value="4.39" selected>10 días — 4.39% + IVA</option>
+            <option value="3.39">18 días — 3.39% + IVA</option>
+            <option value="1.49">35 días — 1.49% + IVA</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field-grid">
+        <div class="field">
+          <label>Comisión pasarela (%)</label>
+          <input type="number" id="ec-com" value="4.39" min="0" max="100" step="0.01" />
+          <span class="hint">Neta sin IVA (como RI recuperás el crédito)</span>
+        </div>
+        <div class="field">
+          <label>Fee plataforma extra (%)</label>
+          <input type="number" id="ec-tn-fee" value="2" min="0" max="100" step="0.1" />
+          <span class="hint" id="ec-tn-hint">Tiendanube 2% por pasarela externa</span>
+        </div>
+      </div>
+
+      <div class="card-title" style="margin-top:1.25rem;">Cuotas e impuestos financieros</div>
+      <div class="field-grid three">
+        <div class="field">
+          <label>Cuotas sin interés — % neto sin IVA</label>
+          <input type="number" id="ec-cuotas" value="0" min="0" max="50" step="0.1" />
+          <span class="hint">Ej: 7.7% para 3x (bruto c/IVA ≈ 9.32%)</span>
+        </div>
+        <div class="field">
+          <label>Imp. Créditos y Débitos / ICD (%)</label>
+          <input type="number" id="ec-icd" value="0.6" min="0" max="5" step="0.1" />
+          <span class="hint">0.6% — sin crédito fiscal, costo directo</span>
+        </div>
+        <div class="field">
+          <label>Otros costos con IVA (ARS)</label>
+          <input type="number" id="ec-otros" value="0" min="0" step="100" />
+          <span class="hint">Envío, packaging, etc. (ingresá con IVA)</span>
+        </div>
+      </div>
+
+      <!-- WARNING -->
+      <div class="warning-neg" id="ec-warning">⚠ Estás vendiendo por debajo del costo — perdés plata en cada venta.</div>
+
+      <!-- TRIO RESULTS -->
+      <div class="margen-trio" style="margin-top:1rem;">
+        <div class="mt-box mt-ganancia" id="ec-gan-box">
+          <div class="mt-label">Ganancia neta / venta</div>
+          <div class="mt-value" id="ec-gan">—</div>
+        </div>
+        <div class="mt-box mt-margen">
+          <div class="mt-label">Margen s/ venta neta</div>
+          <div class="mt-value" id="ec-margen">—</div>
+        </div>
+        <div class="mt-box mt-markup">
+          <div class="mt-label">En USD</div>
+          <div class="mt-value" id="ec-usd">—</div>
+        </div>
+      </div>
+
+      <!-- ═══ BREAKDOWN: PARTE 1 — ESTADO DE CUENTA (BRUTO) ═══ -->
+      <div class="card-title" style="margin-top:1.25rem;">Estado de cuenta — lo que descuenta la plataforma</div>
+      <div class="breakdown" style="margin-bottom:4px;">
+        <div class="brow"><span class="bl" style="font-weight:500;">Precio de venta (pago recibido)</span><span class="bv" id="ec-b-pventa" style="font-weight:500;">—</span></div>
+        <div class="brow sub"><span class="bl">− ICD / Imp. Créditos y Débitos<span class="badge" id="ec-b-icd-pct">0.6%</span></span><span class="bv negative" id="ec-b-icd">—</span></div>
+        <div class="brow sub"><span class="bl">− Cuotas sin interés (bruto)<span class="badge" id="ec-b-cuotas-gross-pct">0%</span></span><span class="bv negative" id="ec-b-cuotas-gross">—</span></div>
+        <div class="brow sub"><span class="bl">− Cargo pasarela (bruto)<span class="badge" id="ec-b-com-gross-pct">4.39%</span></span><span class="bv negative" id="ec-b-com-gross">—</span></div>
+        <div class="brow sub"><span class="bl">− Fee plataforma (bruto)<span class="badge" id="ec-b-tn-gross-pct">2%</span></span><span class="bv negative" id="ec-b-tn-gross">—</span></div>
+        <div class="brow total-row" style="background:rgba(74,158,255,0.07);border-top-color:rgba(74,158,255,0.2);">
+          <span class="bl" style="color:var(--blue);">= Total liquidado por plataforma</span>
+          <span class="bv" id="ec-b-liquidado" style="color:var(--blue);">—</span>
+        </div>
+      </div>
+      <div style="font-size:11px;color:var(--text-3);margin-bottom:12px;padding:0 2px;">↑ Estos valores coinciden con tu resumen de Mercado Pago / TiendaNube</div>
+
+      <!-- ═══ BREAKDOWN: PARTE 2 — AJUSTE RI → GANANCIA NETA ═══ -->
+      <div class="card-title">Ajuste contable — Responsable Inscripto</div>
+      <div class="breakdown" style="margin-bottom:12px;">
+        <div class="brow sub"><span class="bl">Total liquidado</span><span class="bv" id="ec-b-liquidado2">—</span></div>
+        <div class="brow sub"><span class="bl">− Costo producto neto (sin IVA)</span><span class="bv negative" id="ec-b-costo">—</span></div>
+        <div class="brow sub"><span class="bl">− Otros costos neto (sin IVA)</span><span class="bv negative" id="ec-b-otros">—</span></div>
+        <div class="brow sub"><span class="bl">− IVA débito fiscal s/ venta</span><span class="bv negative" id="ec-b-iva-deb">—</span></div>
+        <div class="brow sub" style="color:var(--accent)"><span class="bl" style="color:var(--accent);">+ IVA crédito fiscal (comisiones + cuotas)</span><span class="bv" id="ec-b-iva-cf" style="color:var(--accent);">—</span></div>
+        <div class="brow sub" id="ec-b-ads-row" style="display:none;"><span class="bl">− Gasto Meta Ads (CPA)<span class="badge" id="ec-b-ads-badge">—</span></span><span class="bv negative" id="ec-b-ads">—</span></div>
+        <div class="brow total-row"><span class="bl" id="ec-b-gan-label">Ganancia neta real (sin IVA)</span><span class="bv" id="ec-b-gan">—</span></div>
+      </div>
+
+      <!-- CPA BREAK-EVEN + SLIDER -->
+      <div class="card-title">CPA máximo según margen objetivo</div>
+      <div style="background:var(--bg-input);border-radius:var(--radius-lg);padding:14px 16px;margin-bottom:12px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+          <span style="font-size:13px;color:var(--text-2);">Margen objetivo: <span id="ec-slider-pct-label" style="color:var(--text-1);font-weight:500;font-family:var(--mono);">0%</span></span>
+          <div style="text-align:right;">
+            <span style="font-size:11px;color:var(--text-3);">CPA máximo</span><br/>
+            <span id="ec-cpa-for-margin" style="font-family:var(--mono);font-size:18px;font-weight:500;color:var(--blue);">—</span>
+          </div>
+        </div>
+        <input type="range" id="ec-margin-slider" min="0" max="60" value="0" step="1"
+          style="width:100%;accent-color:var(--blue);cursor:pointer;" oninput="onSliderChange()" />
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-3);margin-top:4px;">
+          <span>0% (break-even)</span><span>30%</span><span>60%</span>
+        </div>
+        <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          <div>
+            <div style="font-size:11px;color:var(--text-3);margin-bottom:3px;">CPA break-even (margen 0%)</div>
+            <div style="font-family:var(--mono);font-size:15px;color:var(--blue);" id="ec-cpa-be-static">—</div>
+          </div>
+          <div>
+            <div style="font-size:11px;color:var(--text-3);margin-bottom:3px;">ROAS mínimo requerido</div>
+            <div style="font-family:var(--mono);font-size:15px;color:var(--text-1);" id="ec-roas-min">—</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- META ADS -->
+      <div class="card-title" style="margin-top:0.25rem;">
+        <span style="color:var(--blue);">▲</span> Meta Ads
+      </div>
+      <div class="field-grid three">
+        <div class="field">
+          <label>Gasto diario en ads (USD)</label>
+          <input type="number" id="ec-ads-usd" value="0" min="0" step="1" />
+          <span class="hint">Sin IVA — Meta no factura IVA</span>
+        </div>
+        <div class="field">
+          <label>Período (días)</label>
+          <input type="number" id="ec-ads-dias" value="30" min="1" step="1" />
+        </div>
+        <div class="field">
+          <label>Ventas estimadas en el período</label>
+          <input type="number" id="ec-ads-ventas" value="0" min="0" step="1" />
+          <span class="hint">Para calcular CPA real del período</span>
+        </div>
+      </div>
+
+      <!-- CPA REAL OBTENIDO -->
+      <div class="field-grid" style="margin-top:0;">
+        <div class="field">
+          <label>CPA real obtenido en Meta (USD) <span style="color:var(--text-3);font-weight:400;">— opcional</span></label>
+          <input type="number" id="ec-cpa-real-input" value="" min="0" step="0.01" placeholder="Ej: 12.50" />
+          <span class="hint">Si ya tenés el dato de Meta → actualiza la ganancia final</span>
+        </div>
+        <div class="field" style="justify-content:flex-end;padding-bottom:4px;">
+          <div class="derived-row" style="margin:0;height:100%;display:flex;flex-direction:column;justify-content:center;">
+            Tipo de cambio: <span id="ec-ads-fx-label" style="color:var(--accent);">$ 1500</span><br/>
+            Gasto total: <span id="ec-ads-total-ars">—</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- KPI RESULTADOS CON ADS -->
+      <div id="ec-ads-results" style="margin-top:0.5rem;display:none;">
+        <div class="card-title">Resultados con pauta</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
+          <div class="metric-box" id="ec-cpa-real-box" style="background:var(--blue-bg);border:1px solid rgba(74,158,255,0.15);">
+            <div class="mb-label" style="color:var(--blue);">CPA real de campaña</div>
+            <div class="mb-value" id="ec-cpa-real-disp" style="color:var(--blue);">—</div>
+          </div>
+          <div class="metric-box">
+            <div class="mb-label">ROAS actual</div>
+            <div class="mb-value" id="ec-roas">—</div>
+          </div>
+          <div class="metric-box">
+            <div class="mb-label">Gasto total ads</div>
+            <div class="mb-value" id="ec-ads-gasto-total">—</div>
+          </div>
+          <div class="metric-box">
+            <div class="mb-label">Facturación bruta</div>
+            <div class="mb-value" id="ec-facturacion">—</div>
+          </div>
+          <div class="metric-box" id="ec-gan-periodo-box" style="grid-column:1/-1;">
+            <div class="mb-label">Ganancia neta del período (con ads)</div>
+            <div class="mb-value" id="ec-gan-periodo">—</div>
+          </div>
+        </div>
+        <div class="metric-box" style="text-align:center;padding:14px;margin-bottom:10px;">
+          <div class="mb-label" id="ec-rent-label">% Rentabilidad neta (incluye Meta Ads)</div>
+          <div style="font-family:var(--mono);font-size:32px;font-weight:500;margin-top:6px;" id="ec-rentabilidad">—</div>
+        </div>
+
+        <!-- ESCENARIOS -->
+        <div class="card-title">Escenarios de rentabilidad</div>
+        <div style="overflow-x:auto;margin-bottom:0;">
+          <table id="ec-escenarios" style="width:100%;border-collapse:collapse;font-size:12.5px;">
+            <thead>
+              <tr style="border-bottom:1px solid var(--border);">
+                <th style="text-align:left;padding:8px 10px;color:var(--text-3);font-weight:500;text-transform:uppercase;font-size:10px;letter-spacing:0.07em;">Escenario</th>
+                <th style="text-align:center;padding:8px 6px;color:var(--text-3);font-weight:500;text-transform:uppercase;font-size:10px;letter-spacing:0.07em;">ROAS</th>
+                <th style="text-align:right;padding:8px 6px;color:var(--text-3);font-weight:500;text-transform:uppercase;font-size:10px;letter-spacing:0.07em;">CPA máx.</th>
+                <th style="text-align:right;padding:8px 6px;color:var(--text-3);font-weight:500;text-transform:uppercase;font-size:10px;letter-spacing:0.07em;">Ventas nec.</th>
+                <th style="text-align:right;padding:8px 10px;color:var(--text-3);font-weight:500;text-transform:uppercase;font-size:10px;letter-spacing:0.07em;">Ganancia neta</th>
+              </tr>
+            </thead>
+            <tbody id="ec-escenarios-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div><!-- /margen-card -->
+    </div><!-- /body-ecom -->
+
   </div><!-- /inputs-col -->
 </main>
 
@@ -818,31 +1099,32 @@
   }
 
   function calcImport() {
-    const uc   = parseFloat(document.getElementById('unit_cost').value) || 0;
-    const qty  = parseInt(document.getElementById('qty').value) || 1;
-    const ship = parseFloat(document.getElementById('ship').value) || 0;
-    const ins  = parseFloat(document.getElementById('ins').value) || 0;
-    const de   = parseFloat(document.getElementById('de').value) || 0;
-    const te   = parseFloat(document.getElementById('te').value) || 0;
-    const iva  = parseFloat(document.getElementById('iva').value) || 0;
-    const fees = parseFloat(document.getElementById('fees').value) || 0;
-    const ivaFeesPct = parseFloat(document.getElementById('iva-fees').value) || 0;
-    const fx   = parseFloat(document.getElementById('fx').value) || 1;
+    const uc      = parseFloat(document.getElementById('unit_cost').value) || 0;
+    const qty     = parseInt(document.getElementById('qty').value) || 1;
+    const ship    = parseFloat(document.getElementById('ship').value) || 0;
+    const ins     = parseFloat(document.getElementById('ins').value) || 0;
+    const de      = parseFloat(document.getElementById('de').value) || 0;
+    const te      = parseFloat(document.getElementById('te').value) || 0;
+    const iva     = parseFloat(document.getElementById('iva').value) || 0;
+    const fees    = parseFloat(document.getElementById('fees').value) || 0;
+    const feesIva = parseFloat(document.getElementById('fees-iva').value) || 0;
+    const fx      = parseFloat(document.getElementById('fx').value) || 1;
 
-    const prodTotal = uc * qty;
-    const fobShip   = prodTotal + ship;
-    const insAmt    = fobShip * ins / 100;
-    const cif       = fobShip + insAmt;
-    const deAmt     = cif * de / 100;
-    const teAmt     = cif * te / 100;
-    const baseImp   = cif + deAmt + teAmt;
-    const ivaAmt    = baseImp * iva / 100;
-    const feesIvaAmt = fees * ivaFeesPct / 100;
-    const total       = baseImp + ivaAmt + fees + feesIvaAmt;
-    // Lo que efectivamente se paga al courier/aduana (no incluye el FOB de la mercadería)
-    const courierTotal = deAmt + teAmt + ivaAmt + fees + feesIvaAmt;
-    const perUnit   = total / qty;
+    const prodTotal  = uc * qty;
+    const fobShip    = prodTotal + ship;
+    const insAmt     = fobShip * ins / 100;
+    const cif        = fobShip + insAmt;
+    const deAmt      = cif * de / 100;
+    const teAmt      = cif * te / 100;
+    const baseImp    = cif + deAmt + teAmt;
+    const ivaAmt     = baseImp * iva / 100;
+    const feesIvaAmt = fees * feesIva / 100;
+    const total      = baseImp + ivaAmt + fees + feesIvaAmt;
+    const perUnit    = total / qty;
     const perUnitARS = perUnit * fx;
+
+    // Gastos courier/aduana = aranceles (DE+TE+IVA) + honorarios + IVA honorarios
+    const courierTotal = deAmt + teAmt + ivaAmt + fees + feesIvaAmt;
 
     // sync costo field si el usuario no lo editó manualmente
     costoFromCalc = perUnitARS;
@@ -850,36 +1132,42 @@
       document.getElementById('costo-manual').value = perUnitARS.toFixed(0);
       document.getElementById('iva-compra-man').value = iva.toFixed(1);
     }
+    // sync sección 3
+    ecCostoFromCalc = perUnitARS;
+    if (!ecUserEdited) {
+      document.getElementById('ec-costo').value = perUnitARS.toFixed(0);
+      document.getElementById('ec-iva-compra').value = iva.toFixed(1);
+    }
 
-    document.getElementById('d-prod').textContent     = usd(prodTotal);
-    document.getElementById('r-unit-usd').textContent = usd(perUnit);
-    document.getElementById('r-unit-ars').textContent = ars(perUnitARS);
-    document.getElementById('pill-import').textContent = usd(perUnit) + ' / u';
-    document.getElementById('r-cif').textContent      = usd(cif);
-    document.getElementById('r-tax').textContent      = usd(deAmt + teAmt);
-    document.getElementById('r-iva').textContent      = usd(ivaAmt + feesIvaAmt);
-    document.getElementById('r-total').textContent    = usd(total);
-    document.getElementById('b-uc').textContent       = usd(uc);
-    document.getElementById('b-qty').textContent      = qty;
-    document.getElementById('b-pt').textContent       = usd(prodTotal);
-    document.getElementById('b-ship').textContent     = usd(ship);
-    document.getElementById('b-ins').textContent      = usd(insAmt);
-    document.getElementById('b-ins-pct').textContent  = pct(ins);
-    document.getElementById('b-cif').textContent      = usd(cif);
-    document.getElementById('b-de').textContent       = usd(deAmt);
-    document.getElementById('b-de-pct').textContent   = pct(de);
-    document.getElementById('b-te').textContent       = usd(teAmt);
-    document.getElementById('b-te-pct').textContent   = pct(te);
-    document.getElementById('b-base').textContent     = usd(baseImp);
-    document.getElementById('b-iva2').textContent     = usd(ivaAmt);
-    document.getElementById('b-iva-pct').textContent  = pct(iva);
-    document.getElementById('b-fees').textContent     = usd(fees);
-    document.getElementById('b-fees-iva').textContent    = usd(feesIvaAmt);
-    document.getElementById('b-fees-iva-pct').textContent = pct(ivaFeesPct);
-    document.getElementById('b-tusd').textContent     = usd(total);
-    document.getElementById('b-tars').textContent     = ars(total * fx);
+    document.getElementById('d-prod').textContent        = usd(prodTotal);
+    document.getElementById('r-unit-usd').textContent    = usd(perUnit);
+    document.getElementById('r-unit-ars').textContent    = ars(perUnitARS);
+    document.getElementById('pill-import').textContent   = usd(perUnit) + ' / u';
     document.getElementById('r-courier-usd').textContent = usd(courierTotal);
     document.getElementById('r-courier-ars').textContent = ars(courierTotal * fx);
+    document.getElementById('r-cif').textContent         = usd(cif);
+    document.getElementById('r-tax').textContent         = usd(deAmt + teAmt);
+    document.getElementById('r-iva').textContent         = usd(ivaAmt);
+    document.getElementById('r-total').textContent       = usd(total);
+    document.getElementById('b-uc').textContent          = usd(uc);
+    document.getElementById('b-qty').textContent         = qty;
+    document.getElementById('b-pt').textContent          = usd(prodTotal);
+    document.getElementById('b-ship').textContent        = usd(ship);
+    document.getElementById('b-ins').textContent         = usd(insAmt);
+    document.getElementById('b-ins-pct').textContent     = pct(ins);
+    document.getElementById('b-cif').textContent         = usd(cif);
+    document.getElementById('b-de').textContent          = usd(deAmt);
+    document.getElementById('b-de-pct').textContent      = pct(de);
+    document.getElementById('b-te').textContent          = usd(teAmt);
+    document.getElementById('b-te-pct').textContent      = pct(te);
+    document.getElementById('b-base').textContent        = usd(baseImp);
+    document.getElementById('b-iva2').textContent        = usd(ivaAmt);
+    document.getElementById('b-iva-pct').textContent     = pct(iva);
+    document.getElementById('b-fees').textContent        = usd(fees);
+    document.getElementById('b-fees-iva').textContent    = usd(feesIvaAmt);
+    document.getElementById('b-fees-iva-pct').textContent = pct(feesIva);
+    document.getElementById('b-tusd').textContent        = usd(total);
+    document.getElementById('b-tars').textContent        = ars(total * fx);
 
     return { perUnitARS, iva };
   }
@@ -955,9 +1243,387 @@
   function calc() {
     calcImport();
     calcMargen();
+    calcEcom();
+    saveState();
   }
 
-  // detectar edición manual del campo costo
+  // ── PERSISTENCIA ──────────────────────────────────────────────────────────
+  const SAVE_KEY = 'arancelpro_v1';
+
+  const INPUT_IDS = [
+    // Sección 1
+    'unit_cost','qty','ship','ins','de','te','iva','fees','fees-iva','fx',
+    // Sección 2
+    'costo-manual','iva-compra-man','pventa','iva-venta','com-ml','envio-ml','cuotas-ml',
+    // Sección 3
+    'ec-pventa','ec-iva-venta','ec-costo','ec-iva-compra','ec-com','ec-tn-fee',
+    'ec-cuotas','ec-icd','ec-otros','ec-ads-usd','ec-ads-dias','ec-ads-ventas','ec-cpa-real-input'
+  ];
+
+  function saveState() {
+    try {
+      const data = {};
+      INPUT_IDS.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) data[id] = el.value;
+      });
+      // guardar también el select de acreditación MP y el estado de plataforma/gateway
+      const mpTiming = document.getElementById('ec-mp-timing');
+      if (mpTiming) data['ec-mp-timing'] = mpTiming.value;
+      data['ecPlatform'] = ecPlatform;
+      data['ecGateway']  = ecGateway;
+      data['userEditedCosto'] = userEditedCosto;
+      data['ecUserEdited']    = ecUserEdited;
+      localStorage.setItem(SAVE_KEY, JSON.stringify(data));
+    } catch(e) {}
+  }
+
+  function restoreState() {
+    try {
+      const raw = localStorage.getItem(SAVE_KEY);
+      if (!raw) return false;
+      const data = JSON.parse(raw);
+      INPUT_IDS.forEach(id => {
+        if (data[id] !== undefined) {
+          const el = document.getElementById(id);
+          if (el) el.value = data[id];
+        }
+      });
+      const mpTiming = document.getElementById('ec-mp-timing');
+      if (mpTiming && data['ec-mp-timing']) mpTiming.value = data['ec-mp-timing'];
+      if (data['ecPlatform']) setPlatform(data['ecPlatform']);
+      if (data['ecGateway'])  setGateway(data['ecGateway']);
+      if (data['userEditedCosto']) {
+        userEditedCosto = true;
+        const el = document.getElementById('costo-manual');
+        if (el) { el.style.borderColor = 'var(--amber)'; document.getElementById('btn-reset').style.display = 'block'; }
+      }
+      if (data['ecUserEdited']) {
+        ecUserEdited = true;
+        const el = document.getElementById('ec-costo');
+        if (el) { el.style.borderColor = 'var(--amber)'; document.getElementById('ec-btn-reset').style.display = 'block'; }
+      }
+      return true;
+    } catch(e) { return false; }
+  }
+
+  // ── SECTION 3: ECOMMERCE ──────────────────────────────────────────────
+  let ecPlatform = 'tiendanube';
+  let ecGateway  = 'mp';
+  let ecCostoFromCalc = 0;
+  let ecUserEdited = false;
+
+  const platformNotes = {
+    tiendanube: 'Tiendanube cobra <span>2%</span> extra sobre el monto de venta si usás pasarela externa (MP, Stripe, etc.)',
+    shopify:    'Shopify cobra <span>0.5–2%</span> extra por transacción si no usás Shopify Payments (varía según plan)',
+    otra:       'Ingresá manualmente el fee de la plataforma si aplica'
+  };
+
+  function setPlatform(p) {
+    ecPlatform = p;
+    document.querySelectorAll('#ec-platform-btns .ec-toggle-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('pb-' + p).classList.add('active');
+    document.getElementById('ec-platform-note').innerHTML = platformNotes[p];
+    if (p === 'tiendanube') {
+      document.getElementById('ec-tn-fee').value = ecGateway === 'pagoNube' ? 0 : 2;
+      document.getElementById('ec-tn-hint').textContent = 'Tiendanube 2% por pasarela externa (0% si usás Pago Nube)';
+    } else if (p === 'shopify') {
+      document.getElementById('ec-tn-fee').value = 1;
+      document.getElementById('ec-tn-hint').textContent = 'Fee Shopify por transacción (0% con Shopify Payments)';
+    } else {
+      document.getElementById('ec-tn-fee').value = 0;
+      document.getElementById('ec-tn-hint').textContent = 'Fee de la plataforma (si aplica)';
+    }
+    calcEcom();
+  }
+
+  const mpRates = { '6.29': 6.29, '4.39': 4.39, '3.39': 3.39, '1.49': 1.49 };
+
+  function setGateway(g) {
+    ecGateway = g;
+    document.querySelectorAll('#ec-gateway-btns .ec-toggle-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('gb-' + g).classList.add('active');
+    const mpBlock = document.getElementById('ec-mp-acred');
+    if (g === 'mp') {
+      mpBlock.style.display = 'block';
+      setMpTiming();
+      if (ecPlatform === 'tiendanube') document.getElementById('ec-tn-fee').value = 2;
+    } else if (g === 'pagoNube') {
+      mpBlock.style.display = 'none';
+      document.getElementById('ec-com').value = '0';
+      if (ecPlatform === 'tiendanube') document.getElementById('ec-tn-fee').value = 0;
+      document.getElementById('ec-tn-hint').textContent = 'Pago Nube: sin fee de plataforma extra';
+    } else {
+      mpBlock.style.display = 'none';
+      if (ecPlatform === 'tiendanube') document.getElementById('ec-tn-fee').value = 2;
+    }
+    calcEcom();
+  }
+
+  function setMpTiming() {
+    const sel = document.getElementById('ec-mp-timing');
+    document.getElementById('ec-com').value = sel.value;
+    calcEcom();
+  }
+
+  function resetEcCosto() {
+    ecUserEdited = false;
+    const el = document.getElementById('ec-costo');
+    el.value = ecCostoFromCalc.toFixed(0);
+    el.style.borderColor = '';
+    document.getElementById('ec-btn-reset').style.display = 'none';
+    document.getElementById('ec-costo-hint').textContent = 'Tomado de la calculadora — editá para otro producto';
+    calcEcom();
+  }
+
+  function calcEcom() {
+    const pventa      = parseFloat(document.getElementById('ec-pventa').value) || 0;
+    const ivaVenta    = parseFloat(document.getElementById('ec-iva-venta').value) || 0;
+    const costoIVA    = parseFloat(document.getElementById('ec-costo').value) || 0;
+    const ivaCompra   = parseFloat(document.getElementById('ec-iva-compra').value) || 0;
+    const com         = parseFloat(document.getElementById('ec-com').value) || 0;      // % neto sin IVA
+    const tnFee       = parseFloat(document.getElementById('ec-tn-fee').value) || 0;   // % bruto (lo que cobra TN)
+    const cuotas      = parseFloat(document.getElementById('ec-cuotas').value) || 0;   // % neto sin IVA
+    const icd         = parseFloat(document.getElementById('ec-icd').value) || 0;      // % bruto, sin CF
+    const otros       = parseFloat(document.getElementById('ec-otros').value) || 0;    // ARS con IVA
+    const adsUSD      = parseFloat(document.getElementById('ec-ads-usd').value) || 0;
+    const adsDias     = parseFloat(document.getElementById('ec-ads-dias').value) || 30;
+    const adsVentas   = parseFloat(document.getElementById('ec-ads-ventas').value) || 0;
+    const cpaRealInp  = parseFloat(document.getElementById('ec-cpa-real-input').value) || 0;
+    const fx          = parseFloat(document.getElementById('fx').value) || 1;
+    const pillEl      = document.getElementById('pill-ecom');
+
+    document.getElementById('ec-ads-fx-label').textContent = '$ ' + Math.round(fx).toLocaleString('es-AR');
+
+    if (!pventa) {
+      document.getElementById('ec-warning').style.display = 'none';
+      document.getElementById('ec-ads-results').style.display = 'none';
+      document.getElementById('ec-ads-total-ars').textContent = '—';
+      pillEl.textContent = '—';
+      ['ec-gan','ec-margen','ec-usd','ec-b-pventa','ec-b-icd','ec-b-cuotas-gross',
+       'ec-b-com-gross','ec-b-tn-gross','ec-b-liquidado','ec-b-liquidado2',
+       'ec-b-costo','ec-b-otros','ec-b-iva-deb','ec-b-iva-cf','ec-b-gan',
+       'ec-cpa-be-static','ec-roas-min','ec-cpa-for-margin'].forEach(id => {
+        const el = document.getElementById(id); if (el) el.textContent = '—';
+      });
+      return;
+    }
+
+    const divV = 1 + ivaVenta / 100;
+    const divC = 1 + ivaCompra / 100;
+
+    // ── BRUTOS (lo que descuenta la plataforma — coincide con el resumen MP) ──
+    const icdCost      = pventa * icd / 100;                       // sin CF
+    const cuotasGross  = pventa * cuotas / 100 * (1 + ivaVenta/100); // cuotas neto + IVA
+    const comGross     = pventa * com / 100 * (1 + ivaVenta/100);    // comisión neto + IVA
+    const tnGross      = pventa * tnFee / 100;                     // TN cobra % bruto plano
+    const totalDescuentos = icdCost + cuotasGross + comGross + tnGross;
+    const liquidado    = pventa - totalDescuentos;
+
+    // ── NETOS RI (crédito fiscal sobre comisiones con IVA) ──
+    const ventaNeta  = pventa / divV;
+    const ivaDebito  = pventa - ventaNeta;
+    const costoNeto  = costoIVA / divC;
+    const otrosNeto  = otros / divC;
+    // crédito fiscal: IVA de comGross + cuotasGross + tnGross (si tiene IVA)
+    const ivaComGross   = comGross - (comGross / divV);
+    const ivaCuotasGross = cuotasGross - (cuotasGross / divV);
+    const ivaTnGross    = tnGross - (tnGross / divV);
+    const totalIvaCF    = ivaComGross + ivaCuotasGross + ivaTnGross;
+    // neto de cada comisión = gross / divV (o directamente neto)
+    const comNeto    = pventa * com / 100;
+    const cuotasNeto = pventa * cuotas / 100;
+    const tnNeto     = tnGross / divV;
+
+    // ganancia base sin ads
+    const ganBase    = ventaNeta - costoNeto - comNeto - cuotasNeto - tnNeto - icdCost - otrosNeto;
+    const margenBase = ventaNeta > 0 ? (ganBase / ventaNeta) * 100 : 0;
+    const isNeg      = ganBase < 0;
+
+    // CPA break-even (en USD, sin ads = ganBase en ARS)
+    const cpaBeUSD = ganBase / fx;
+
+    // ── ADS ──
+    const gastoTotalUSD     = adsUSD * adsDias;
+    const gastoTotalARS     = gastoTotalUSD * fx;
+    const cpaEstimadoUSD    = adsVentas > 0 ? gastoTotalUSD / adsVentas : 0;
+    // Si hay CPA real ingresado manualmente, usarlo; sino usar el estimado del período
+    const cpaUsadoUSD       = cpaRealInp > 0 ? cpaRealInp : cpaEstimadoUSD;
+    const cpaUsadoARS       = cpaUsadoUSD * fx;
+    const ganConAds         = ganBase - cpaUsadoARS;
+    const margenConAds      = ventaNeta > 0 ? (ganConAds / ventaNeta) * 100 : 0;
+    const ganPeriodo        = adsVentas > 0 ? (ganBase * adsVentas) - gastoTotalARS : 0;
+    const facturacionBruta  = pventa * (adsVentas || 0);
+    const roas              = gastoTotalUSD > 0 ? (facturacionBruta / fx) / gastoTotalUSD : 0;
+    const rentabilidad      = adsVentas > 0 && ventaNeta > 0
+                              ? (ganPeriodo / (ventaNeta * adsVentas)) * 100 : margenBase;
+
+    // ── Trio ──
+    const showAdsMetrics = cpaUsadoUSD > 0;
+    const ganDisplay  = showAdsMetrics ? ganConAds : ganBase;
+    const margenDisp  = showAdsMetrics ? margenConAds : margenBase;
+    document.getElementById('ec-warning').style.display = ganDisplay < 0 ? 'block' : 'none';
+
+    const ganBox = document.getElementById('ec-gan-box');
+    const ganEl  = document.getElementById('ec-gan');
+    ganEl.textContent = ars(ganDisplay);
+    ganBox.style.background  = ganDisplay < 0 ? 'var(--danger-bg)' : 'var(--accent-bg)';
+    ganBox.style.borderColor = ganDisplay < 0 ? 'rgba(255,92,92,0.15)' : 'rgba(0,200,150,0.15)';
+    ganEl.style.color = ganDisplay < 0 ? 'var(--danger)' : 'var(--accent)';
+    ganBox.querySelector('.mt-label').textContent = showAdsMetrics ? 'Ganancia neta / venta (con ads)' : 'Ganancia neta / venta';
+    document.getElementById('ec-margen').textContent = pct(margenDisp);
+    document.getElementById('ec-usd').textContent    = usd(ganDisplay / fx);
+
+    // ── Breakdown PARTE 1 — Brutos (tipo MP) ──
+    document.getElementById('ec-b-pventa').textContent          = ars(pventa);
+    document.getElementById('ec-b-icd').textContent             = ars(icdCost);
+    document.getElementById('ec-b-icd-pct').textContent         = pct(icd);
+    document.getElementById('ec-b-cuotas-gross').textContent    = ars(cuotasGross);
+    document.getElementById('ec-b-cuotas-gross-pct').textContent = pct(cuotas * (1 + ivaVenta/100));
+    document.getElementById('ec-b-com-gross').textContent       = ars(comGross);
+    document.getElementById('ec-b-com-gross-pct').textContent   = pct(com * (1 + ivaVenta/100));
+    document.getElementById('ec-b-tn-gross').textContent        = ars(tnGross);
+    document.getElementById('ec-b-tn-gross-pct').textContent    = pct(tnFee);
+    document.getElementById('ec-b-liquidado').textContent       = ars(liquidado);
+    document.getElementById('ec-b-liquidado2').textContent      = ars(liquidado);
+
+    // ── Breakdown PARTE 2 — Ajuste RI ──
+    document.getElementById('ec-b-costo').textContent   = ars(costoNeto);
+    document.getElementById('ec-b-otros').textContent   = ars(otrosNeto);
+    document.getElementById('ec-b-iva-deb').textContent = ars(ivaDebito);
+    document.getElementById('ec-b-iva-cf').textContent  = '+\u00a0' + ars(totalIvaCF).replace('$\u00a0','');
+
+    // Línea Meta Ads en breakdown
+    const adsRow  = document.getElementById('ec-b-ads-row');
+    const adsRowV = document.getElementById('ec-b-ads');
+    const adsBadge = document.getElementById('ec-b-ads-badge');
+    const ganLabel = document.getElementById('ec-b-gan-label');
+    const bGanEl   = document.getElementById('ec-b-gan');
+
+    if (showAdsMetrics) {
+      adsRow.style.display = '';
+      adsBadge.textContent = cpaRealInp > 0 ? 'CPA real: ' + usd(cpaRealInp) : 'CPA estimado: ' + usd(cpaEstimadoUSD);
+      adsRowV.textContent = ars(cpaUsadoARS);
+      bGanEl.textContent = ars(ganConAds);
+      ganLabel.textContent = 'Ganancia neta real (con ads)';
+      bGanEl.style.color = ganConAds < 0 ? 'var(--danger)' : 'var(--accent)';
+    } else {
+      adsRow.style.display = 'none';
+      bGanEl.textContent = ars(ganBase);
+      ganLabel.textContent = 'Ganancia neta real (sin IVA)';
+      bGanEl.style.color = isNeg ? 'var(--danger)' : 'var(--accent)';
+    }
+
+    // ── CPA break-even y slider ──
+    document.getElementById('ec-cpa-be-static').textContent = usd(cpaBeUSD) + ' · ' + ars(ganBase);
+    document.getElementById('ec-roas-min').textContent = cpaBeUSD > 0 ? (pventa / fx / cpaBeUSD).toFixed(2) + 'x' : '—';
+    onSliderChange(); // actualiza slider con datos frescos
+
+    // ── Ads total ──
+    document.getElementById('ec-ads-total-ars').textContent = ars(gastoTotalARS) + ' (' + usd(gastoTotalUSD) + ')';
+
+    const showAdsBlock = gastoTotalUSD > 0 || adsVentas > 0 || cpaRealInp > 0;
+    document.getElementById('ec-ads-results').style.display = showAdsBlock ? 'block' : 'none';
+
+    if (showAdsBlock) {
+      const cpaRealDisp = document.getElementById('ec-cpa-real-disp');
+      const cpaBox      = document.getElementById('ec-cpa-real-box');
+      const cpaToShow   = cpaRealInp > 0 ? cpaRealInp : (adsVentas > 0 ? cpaEstimadoUSD : 0);
+      if (cpaToShow > 0) {
+        const overBe = cpaToShow > cpaBeUSD;
+        cpaRealDisp.textContent = usd(cpaToShow) + ' · ' + ars(cpaToShow * fx);
+        cpaRealDisp.style.color = overBe ? 'var(--danger)' : 'var(--accent)';
+        cpaBox.style.background = overBe ? 'var(--danger-bg)' : 'var(--accent-bg)';
+        cpaBox.style.border     = overBe ? '1px solid rgba(255,92,92,0.15)' : '1px solid rgba(0,200,150,0.15)';
+        cpaBox.querySelector('.mb-label').textContent = cpaRealInp > 0 ? 'CPA real ingresado' : 'CPA real estimado del período';
+        cpaBox.querySelector('.mb-label').style.color = overBe ? 'var(--danger)' : 'var(--blue)';
+      } else {
+        cpaRealDisp.textContent = '—'; cpaRealDisp.style.color = 'var(--text-1)';
+        cpaBox.style.background = 'var(--blue-bg)'; cpaBox.style.border = '1px solid rgba(74,158,255,0.15)';
+      }
+
+      document.getElementById('ec-ads-gasto-total').textContent = ars(gastoTotalARS) + ' (' + usd(gastoTotalUSD) + ')';
+      document.getElementById('ec-facturacion').textContent     = adsVentas > 0 ? ars(facturacionBruta) : '—';
+      document.getElementById('ec-roas').textContent            = adsVentas > 0 && roas > 0 ? roas.toFixed(2) + 'x' : '—';
+
+      const ganPBox = document.getElementById('ec-gan-periodo-box');
+      const ganPEl  = document.getElementById('ec-gan-periodo');
+      if (adsVentas > 0) {
+        const negP = ganPeriodo < 0;
+        ganPEl.textContent = ars(ganPeriodo) + ' (' + usd(ganPeriodo / fx) + ')';
+        ganPEl.style.color  = negP ? 'var(--danger)' : 'var(--accent)';
+        ganPBox.style.background = negP ? 'var(--danger-bg)' : 'var(--accent-bg)';
+        ganPBox.style.border     = negP ? '1px solid rgba(255,92,92,0.15)' : '1px solid rgba(0,200,150,0.15)';
+      } else { ganPEl.textContent = '—'; }
+
+      const rentEl  = document.getElementById('ec-rentabilidad');
+      const rentVal = showAdsMetrics ? rentabilidad : margenBase;
+      rentEl.textContent = pct(rentVal);
+      rentEl.style.color = rentVal < 0 ? 'var(--danger)' : rentVal < 15 ? 'var(--amber)' : 'var(--accent)';
+
+      // ── Tabla de escenarios ──
+      const escenarios = [
+        { label: 'Break Even', color: '#e74c3c', bg: 'rgba(231,76,60,0.15)', margen: 0  },
+        { label: 'Mínimo',     color: '#f5a623', bg: 'rgba(245,166,35,0.15)', margen: 10 },
+        { label: 'Bueno',      color: '#4a9eff', bg: 'rgba(74,158,255,0.15)', margen: 20 },
+        { label: 'Excelente',  color: '#00c896', bg: 'rgba(0,200,150,0.15)',  margen: 30 },
+      ];
+      const tbody = document.getElementById('ec-escenarios-body');
+      tbody.innerHTML = '';
+      escenarios.forEach(e => {
+        // CPA máx para ese margen: ganBase - (margen/100 * ventaNeta) = CPA
+        const cpaMaxARS  = ganBase - (e.margen / 100 * ventaNeta);
+        const cpaMaxUSD  = cpaMaxARS / fx;
+        const ventasNec  = gastoTotalUSD > 0 && cpaMaxUSD > 0 ? gastoTotalUSD / cpaMaxUSD : 0;
+        const ganNetaTot = ventasNec > 0 ? (ganBase * ventasNec) - gastoTotalARS : cpaMaxARS;
+        const roas_e     = cpaMaxUSD > 0 ? pventa / fx / cpaMaxUSD : 0;
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><span class="esc-badge" style="color:${e.color};background:${e.bg};">${e.label}</span></td>
+          <td>${roas_e > 0 ? roas_e.toFixed(1) + 'x' : '—'}</td>
+          <td>${cpaMaxUSD > 0 ? usd(cpaMaxUSD) : '—'}</td>
+          <td>${gastoTotalUSD > 0 && ventasNec > 0 ? ventasNec.toFixed(1) : '—'}</td>
+          <td style="color:${ganNetaTot >= 0 ? 'var(--accent)' : 'var(--danger)'};">${usd(gastoTotalUSD > 0 ? ganNetaTot / fx : cpaMaxARS / fx)}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    pillEl.textContent   = pct(showAdsMetrics ? margenConAds : margenBase) + ' margen';
+    pillEl.style.color   = ganDisplay < 0 ? 'var(--danger)' : 'var(--amber)';
+    pillEl.style.borderColor = ganDisplay < 0 ? 'rgba(255,92,92,0.3)' : 'rgba(245,166,35,0.3)';
+
+    // guardar ganBase y ventaNeta para el slider
+    window._ecGanBase   = ganBase;
+    window._ecVentaNeta = ventaNeta;
+    window._ecFx        = fx;
+    window._ecPventa    = pventa;
+    onSliderChange();
+  }
+
+  function onSliderChange() {
+    const slider  = document.getElementById('ec-margin-slider');
+    const margen  = parseFloat(slider.value) || 0;
+    document.getElementById('ec-slider-pct-label').textContent = margen + '%';
+    const ganBase   = window._ecGanBase   || 0;
+    const ventaNeta = window._ecVentaNeta || 0;
+    const fx        = window._ecFx        || 1;
+    const pventa    = window._ecPventa    || 0;
+    // CPA máximo para ese margen = ganBase - (margen/100 * ventaNeta)
+    const cpaMaxARS = ganBase - (margen / 100 * ventaNeta);
+    const cpaMaxUSD = fx > 0 ? cpaMaxARS / fx : 0;
+    const el = document.getElementById('ec-cpa-for-margin');
+    if (cpaMaxUSD > 0) {
+      el.textContent = usd(cpaMaxUSD) + '  ·  ' + ars(cpaMaxARS);
+      el.style.color = 'var(--blue)';
+    } else {
+      el.textContent = 'No viable con ese margen';
+      el.style.color = 'var(--danger)';
+    }
+  }
+
+  document.querySelectorAll('input:not(#costo-manual):not(#ec-costo):not(#ec-margin-slider)').forEach(el => el.addEventListener('input', calc));
+
   document.getElementById('costo-manual').addEventListener('input', function() {
     const val = parseFloat(this.value);
     if (!isNaN(val) && Math.abs(val - costoFromCalc) > 1) {
@@ -966,10 +1632,22 @@
       document.getElementById('btn-reset').style.display = 'block';
       document.getElementById('costo-hint').textContent = 'Editado manualmente — presioná ↺ sync para volver al valor calculado';
     }
-    calcMargen();
+    calc();
   });
 
-  document.querySelectorAll('input:not(#costo-manual)').forEach(el => el.addEventListener('input', calc));
+  document.getElementById('ec-costo').addEventListener('input', function() {
+    const val = parseFloat(this.value);
+    if (!isNaN(val) && Math.abs(val - ecCostoFromCalc) > 1) {
+      ecUserEdited = true;
+      this.style.borderColor = 'var(--amber)';
+      document.getElementById('ec-btn-reset').style.display = 'block';
+      document.getElementById('ec-costo-hint').textContent = 'Editado manualmente — presioná ↺ sync para volver al valor calculado';
+    }
+    calc();
+  });
+
+  // Restaurar estado guardado al cargar, o calcular con defaults
+  const restored = restoreState();
   calc();
 </script>
 </body>
